@@ -65,15 +65,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>Rocket automatically performs validation. In this case, if one of our parameters is left off, or the value provided is not a <code>u8</code>, we get a <code>None</code> for that field. So, when something tries to access <code>ourserver.com/passphrase?[whatever]</code>, let’s translate that to a <code>passphrase_gen()</code> call with appropriate values.</p>
 <div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="at">#[</span>get<span class="at">(</span><span class="st">&quot;/passphrase?&lt;params&gt;&quot;</span><span class="at">)]</span>
 <span class="kw">fn</span> phrase_params(params: PhraseParams) -&gt; <span class="dt">String</span> {
-    <span class="kw">let</span> num_words = <span class="kw">match</span> params.length {
-        <span class="cn">Some</span>(x) =&gt; x,
-        <span class="cn">None</span> =&gt; DEFAULT_LENGTH
-    };
-
-    <span class="kw">let</span> num_digits = <span class="kw">match</span> params.digits {
-        <span class="cn">Some</span>(y) =&gt; y,
-        <span class="cn">None</span> =&gt; DEFAULT_DIGITS
-    };
+    <span class="kw">let</span> num_words = params.length.unwrap_or(DEFAULT_LENGTH);
+    <span class="kw">let</span> num_digits = params.digits.unwrap_or(DEFAULT_DIGITS);
 
     passphrase_gen(num_words, num_digits)
 }</code></pre></div>
