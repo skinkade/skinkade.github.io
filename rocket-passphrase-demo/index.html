@@ -47,13 +47,13 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 </head>
 <body>
 <h1 id="rocket-demo-passphrase-generator">Rocket Demo: Passphrase Generator</h1>
-<p><a href="https://rocket.rs/">Rocket</a> is a brand-new web framework Rust with one of the friendliest guides I’ve ever seen. Having basically no experience with either Rust or web development, I decided to give it a shot.</p>
+<p><a href="https://rocket.rs/">Rocket</a> is a brand-new web framework for Rust with one of the friendliest guides I’ve ever seen. Having basically no experience with either Rust or web development, I decided to give it a shot.</p>
 <p>(Note: At the time of writing, Rocket requires Rust nightly.)</p>
 <p>Say we have a function which generates passphrases. It takes arguments for how many words you want in the phrase, and how many digits should be tacked on.</p>
 <div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">fn</span> passphrase_gen(num_words: <span class="dt">u8</span>, num_digits: <span class="dt">u8</span>) -&gt; <span class="dt">String</span> {
     ...
 }</code></pre></div>
-<p>With Rocket, we can define type-safe query strings by a simple struct of their elements. Let’s have optional arguments for our length and digit counts, with defaults we can use otherwise.</p>
+<p>With Rocket, we can define type-safe query strings by a simple struct of their elements. Let’s have optional parameters for our length and digit counts, with defaults we can use otherwise.</p>
 <div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="at">#[</span>derive<span class="at">(</span>FromForm<span class="at">)]</span>
 <span class="kw">struct</span> PhraseParams {
     length: <span class="dt">Option</span>&lt;<span class="dt">u8</span>&gt;,
@@ -82,9 +82,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <span class="kw">fn</span> phrase() -&gt; <span class="dt">String</span> {
     passphrase_gen(DEFAULT_LENGTH, DEFAULT_DIGITS)
 }</code></pre></div>
-<h2 id="code-section-you-probably-care-about">Code (section you probably care about)</h2>
-<p><a href="https://github.com/skinkade/rocket-passphrase-demo">This repository</a> contains a working demo with a Handlebars HTML template that uses XML HTTP requests to the path we defined to update a text field. It also contains some <code>lazy_static</code> insanity for a global CSPRNG and baked-in dictionary for the actual passphrase generator.</p>
-<h3 id="author-section-you-probably-dont-care-about">Author (section you probably don’t care about)</h3>
+<h2 id="code">Code</h2>
+<p><a href="https://github.com/skinkade/rocket-passphrase-demo">This repository</a> contains a working demo with a Handlebars HTML template that uses XML HTTP requests to our route to update an element’s contents. It also contains some <code>lazy_static</code> insanity for a global CSPRNG and baked-in dictionary for the actual passphrase generator.</p>
+<h3 id="author">Author</h3>
 <p>Shawn Kinkade — January, 2017</p>
 </body>
 </html>
