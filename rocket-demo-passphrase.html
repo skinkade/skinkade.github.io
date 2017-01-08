@@ -1,0 +1,90 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;} pre{line-height: 1.3em;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <link rel="stylesheet" href="https://thomasf.github.io/solarized-css/solarized-light.min.css" type="text/css" />
+</head>
+<body>
+<h1 id="rust-rocket-demo-passphrase-generator">Rust &amp; Rocket Demo: Passphrase Generator</h1>
+<p><a href="https://rocket.rs/">Rocket</a> is a brand-new web framework Rust with one of the friendliest guides I’ve ever seen. Having basically no experience with either Rust or web development, I decided to give it a shot.</p>
+<p>(Note: At the time of writing, Rocket requires Rust nightly.)</p>
+<p>Say we have a function which generates passphrases. It takes arguments for how many words you want in the phrase, and how many digits should be tacked on.</p>
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">fn</span> passphrase_gen(num_words: <span class="dt">u8</span>, num_digits: <span class="dt">u8</span>) -&gt; <span class="dt">String</span> {
+    ...
+}</code></pre></div>
+<p>With Rocket, we can define type-safe query strings by a simple struct of their elements. Let’s have optional arguments for our length and digit counts, with defaults we can use otherwise.</p>
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="at">#[</span>derive<span class="at">(</span>FromForm<span class="at">)]</span>
+<span class="kw">struct</span> PhraseParams {
+    length: <span class="dt">Option</span>&lt;<span class="dt">u8</span>&gt;,
+    digits: <span class="dt">Option</span>&lt;<span class="dt">u8</span>&gt;
+}
+
+<span class="kw">static</span> DEFAULT_LENGTH: <span class="dt">u8</span> = <span class="dv">4</span>;
+<span class="kw">static</span> DEFAULT_DIGITS: <span class="dt">u8</span> = <span class="dv">0</span>;</code></pre></div>
+<p>Rocket automatically performs validation. In this case, if one of our parameters is left off, or the value provided is not a <code>u8</code>, we get a <code>None</code> for that field. So, when something tries to access <code>ourserver.com/passphrase?[whatever]</code>, let’s translate that to a <code>passphrase_gen()</code> call with appropriate values.</p>
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="at">#[</span>get<span class="at">(</span><span class="st">&quot;/passphrase?&lt;params&gt;&quot;</span><span class="at">)]</span>
+<span class="kw">fn</span> phrase_params(params: PhraseParams) -&gt; <span class="dt">String</span> {
+    <span class="kw">let</span> num_words = <span class="kw">match</span> params.length {
+        <span class="cn">Some</span>(x) =&gt; x,
+        <span class="cn">None</span> =&gt; DEFAULT_LENGTH
+    };
+
+    <span class="kw">let</span> num_digits = <span class="kw">match</span> params.digits {
+        <span class="cn">Some</span>(y) =&gt; y,
+        <span class="cn">None</span> =&gt; DEFAULT_DIGITS
+    };
+
+    passphrase_gen(num_words, num_digits)
+}</code></pre></div>
+<p>You can have multiple routes going to the same path, and specify their order of priority using <code>rank</code>. If someone tries going to <code>/passphrase</code> without a query string, or with a nonsensical one, we can have a fallback.</p>
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="at">#[</span>get<span class="at">(</span><span class="st">&quot;/passphrase&quot;</span><span class="at">,</span> rank <span class="at">=</span> <span class="dv">2</span><span class="at">)]</span>
+<span class="kw">fn</span> phrase() -&gt; <span class="dt">String</span> {
+    passphrase_gen(DEFAULT_LENGTH, DEFAULT_DIGITS)
+}</code></pre></div>
+<h2 id="code-section-you-probably-care-about">Code (section you probably care about)</h2>
+<p><a href="https://github.com/skinkade/rocket-passphrase-demo">This repository</a> contains a working demo with a Handlebars HTML template that uses XML HTTP requests to the path we defined to update a text field. It also contains some <code>lazy_static</code> insanity for a global CSPRNG and baked-in dictionary for the actual passphrase generator.</p>
+<h3 id="author-section-you-probably-dont-care-about">Author (section you probably don’t care about)</h3>
+<p>Shawn Kinkade — January, 2017</p>
+</body>
+</html>
