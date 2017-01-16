@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;} pre{line-height: 1.3em;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <link rel="stylesheet" href="../css/solarized-light.min.css" type="text/css" />
+</head>
+<body>
+<h1 id="jwt-access-roles-in-rocket">JWT &amp; Access Roles in Rocket</h1>
+<p>This experiment:</p>
+<ul>
+<li>uses Argon2i hashes for passwords</li>
+<li>generates the user a JSON Web Token</li>
+<li>uses the roles stored in the JWT to determine page access</li>
+</ul>
+<p><strong>Note: This is purely an experiment. It is ugly code and you should not use it for literally anything.</strong></p>
+<h2 id="purpose">Purpose</h2>
+<p>In the Yii framework for PHP, a relatively easy form of access control is to assign accounts roles (or derive them from LDAP/AD), and check them with:</p>
+<div class="sourceCode"><pre class="sourceCode php"><code class="sourceCode php">Yii::<span class="kw">$app</span>-&gt;user-&gt;can<span class="ot">(</span><span class="st">&#39;role&#39;</span><span class="ot">);</span></code></pre></div>
+<p>I wanted to see if I could do something similar in Rust, and I also wanted to learn a bit about JSON Web Tokens. What I have at the moment, is putting a string array in the token, so we can just more or less do <code>token.roles.contains(&quot;role&quot;)</code>.</p>
+<h2 id="diesel">Diesel</h2>
+<p>This is a less-than-ideal setup but is sufficient for a test. Our Diesel migration and model are simply username, password, and a (PostgreSQL-specific) string array of roles.</p>
+<div class="sourceCode"><pre class="sourceCode sql"><code class="sourceCode sql"><span class="kw">CREATE</span> <span class="kw">TABLE</span> users (
+    username    TEXT <span class="kw">PRIMARY</span> <span class="kw">KEY</span>,
+    pw_hash     TEXT <span class="kw">NOT</span> <span class="kw">NULL</span>,
+    user_roles  TEXT[] <span class="kw">NOT</span> <span class="kw">NULL</span> <span class="kw">DEFAULT</span> <span class="st">&#39;{&quot;user&quot;}&#39;</span>
+);</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="at">#[</span>derive<span class="at">(</span>Queryable<span class="at">)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> User {
+    <span class="kw">pub</span> username: <span class="dt">String</span>,
+    <span class="kw">pub</span> pw_hash: <span class="dt">String</span>,
+    <span class="kw">pub</span> user_roles: <span class="dt">Vec</span>&lt;<span class="dt">String</span>&gt;,
+}</code></pre></div>
+<h2 id="jwt">JWT</h2>
+<p>There are a number of JWT crates of varying maturity. I settled on <a href="https://crates.io/crates/jsonwebtoken">jsonwebtoken</a>, but you would need e.g. <a href="https://crates.io/crates/frank_jwt">franke_jwt</a> if you want signatures and not just HMAC.</p>
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="at">#[</span>derive<span class="at">(</span><span class="bu">Debug</span><span class="at">,</span> RustcEncodable<span class="at">,</span> RustcDecodable<span class="at">)]</span>
+<span class="kw">struct</span> UserRolesToken {
+    <span class="co">// issued at</span>
+    iat: <span class="dt">i64</span>,
+    user: <span class="dt">String</span>,
+    roles: <span class="dt">Vec</span>&lt;<span class="dt">String</span>&gt;,
+}
+
+<span class="kw">impl</span> UserRolesToken {
+    <span class="kw">fn</span> has_role(&amp;<span class="kw">self</span>, role: <span class="dt">String</span>) -&gt; <span class="dt">bool</span> {
+        <span class="kw">self</span>.roles.contains(&amp;role)
+    }
+}
+
+
+<span class="kw">fn</span> jwt_generate(user: <span class="dt">String</span>, roles: <span class="dt">Vec</span>&lt;<span class="dt">String</span>&gt;) -&gt; <span class="dt">String</span> {
+    <span class="kw">let</span> payload = UserRolesToken {
+        iat: time::get_time().sec,
+        user: user,
+        roles: roles,
+    };
+
+    encode(Header::default(), &amp;payload, KEY).unwrap()
+}</code></pre></div>
+<h2 id="authentication">Authentication</h2>
+<p>Pretty straight-forward. Get the user, verify the password. If things check out, generate a JWT and store it in their cookies.</p>
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="at">#[</span>derive<span class="at">(</span>FromForm<span class="at">)]</span>
+<span class="kw">struct</span> Login {
+    username: <span class="dt">String</span>,
+    password: <span class="dt">String</span>,
+}
+
+<span class="at">#[</span>post<span class="at">(</span><span class="st">&quot;/login&quot;</span><span class="at">,</span> data<span class="at">=</span><span class="st">&quot;&lt;login_form&gt;&quot;</span><span class="at">)]</span>
+<span class="kw">fn</span> login(cookies: &amp;Cookies, login_form: Form&lt;Login&gt;) -&gt; Redirect {
+    <span class="kw">use</span> schema::users::dsl::*;
+
+    <span class="kw">let</span> login = login_form.get();
+    <span class="kw">let</span> connection = establish_connection();
+
+    <span class="kw">let</span> user = <span class="kw">match</span> users.filter(username.eq(&amp;login.username))
+        .first::&lt;models::User&gt;(&amp;connection) {
+        <span class="cn">Ok</span>(u) =&gt; u,
+        <span class="cn">Err</span>(_) =&gt; <span class="kw">return</span> Redirect::to(<span class="st">&quot;/login&quot;</span>),
+    };
+
+    <span class="kw">let</span> hash = user.pw_hash.into_bytes();
+
+    <span class="co">// Argon2 password verifier</span>
+    <span class="kw">let</span> db_hash = Encoded::from_u8(&amp;hash).expect(<span class="st">&quot;Failed to read password hash&quot;</span>);
+    <span class="kw">if</span> !db_hash.verify(login.password.as_ref()) {
+        <span class="kw">return</span> Redirect::to(<span class="st">&quot;/login&quot;</span>);
+    }
+
+    <span class="co">// Add JWT to cookies</span>
+    cookies.add(Cookie::new(<span class="st">&quot;jwt&quot;</span>.into(), jwt_generate(user.username, user.roles)));
+
+    Redirect::to(<span class="st">&quot;/&quot;</span>)
+}</code></pre></div>
+<h2 id="restricted-pages">Restricted Pages</h2>
+<p>Here’s where things get a bit messy. Obviously we don’t want to be constantly checking and re-checking cookies and roles for every route. What I would <em>really</em> like is some additional macro goodness that would allow us to simply write something like…</p>
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="at">#[</span>jwt<span class="at">(</span>user <span class="at">==</span> <span class="st">&quot;admin&quot;</span> <span class="at">||</span> roles<span class="at">.</span>contains<span class="at">(</span><span class="st">&quot;c-level&quot;</span><span class="at">))]</span>
+<span class="at">#[</span>get<span class="at">(</span><span class="st">&quot;/path&quot;</span><span class="at">)]</span>
+<span class="kw">fn</span> special_page() -&gt; ...</code></pre></div>
+<p>In this case, I have a handler that takes a <code>PathBuf</code>, performs the token verification, and returns the results of non-routed functions.</p>
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="at">#[</span>get<span class="at">(</span><span class="st">&quot;/admin/&lt;pathbuf..&gt;&quot;</span><span class="at">)]</span>
+<span class="kw">fn</span> admin_handler(cookies: &amp;Cookies, pathbuf: PathBuf) -&gt; <span class="dt">Option</span>&lt;Template&gt; {
+    <span class="kw">let</span> token = <span class="kw">match</span> cookies.find(<span class="st">&quot;jwt&quot;</span>).map(|cookie| cookie.value) {
+        <span class="cn">Some</span>(jwt) =&gt; jwt,
+        _ =&gt; <span class="kw">return</span> <span class="cn">None</span>,
+    };
+
+    <span class="co">// You&#39;ll want to match on and log errors instead of unwrapping, of course</span>
+    <span class="kw">let</span> token_data = decode::&lt;UserRolesToken&gt;(&amp;token, KEY, Algorithm::HS256).unwrap();
+
+    <span class="kw">if</span> !token_data.claims.has_role(<span class="st">&quot;admin&quot;</span>.to_owned()) {
+        <span class="kw">return</span> <span class="cn">None</span>;
+    }
+
+    <span class="kw">let</span> path = pathbuf.to_str().unwrap();
+    <span class="kw">match</span> path {
+        <span class="st">&quot;index&quot;</span> =&gt; <span class="kw">return</span> <span class="cn">Some</span>(admin_index()),
+        <span class="st">&quot;user&quot;</span> =&gt; <span class="kw">return</span> <span class="cn">Some</span>(display_user(token_data.claims.user)),
+        _ =&gt; <span class="kw">return</span> <span class="cn">None</span>,
+    }
+}</code></pre></div>
+<h2 id="code">Code</h2>
+<p>Working demo site can be found <a href="https://github.com/skinkade/rocket-jwt-roles-demo">here</a>.</p>
+<h3 id="author">Author</h3>
+<p>Shawn Kinkade — January, 2017</p>
+</body>
+</html>
