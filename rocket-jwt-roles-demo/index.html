@@ -77,20 +77,24 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <span class="kw">struct</span> UserRolesToken {
     <span class="co">// issued at</span>
     iat: <span class="dt">i64</span>,
+    <span class="co">// expiration</span>
+    exp: <span class="dt">i64</span>,
     user: <span class="dt">String</span>,
     roles: <span class="dt">Vec</span>&lt;<span class="dt">String</span>&gt;,
 }
 
 <span class="kw">impl</span> UserRolesToken {
-    <span class="kw">fn</span> has_role(&amp;<span class="kw">self</span>, role: <span class="dt">String</span>) -&gt; <span class="dt">bool</span> {
-        <span class="kw">self</span>.roles.contains(&amp;role)
+    <span class="kw">fn</span> has_role(&amp;<span class="kw">self</span>, role: &amp;<span class="dt">str</span>) -&gt; <span class="dt">bool</span> {
+        <span class="kw">self</span>.roles.contains(&amp;role.to_string())
     }
 }
 
 
 <span class="kw">fn</span> jwt_generate(user: <span class="dt">String</span>, roles: <span class="dt">Vec</span>&lt;<span class="dt">String</span>&gt;) -&gt; <span class="dt">String</span> {
+    <span class="kw">let</span> now = time::get_time().sec;
     <span class="kw">let</span> payload = UserRolesToken {
-        iat: time::get_time().sec,
+        iat: now,
+        exp: now + ONE_WEEK,
         user: user,
         roles: roles,
     };
@@ -136,9 +140,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="at">#[</span>jwt<span class="at">(</span>user <span class="at">==</span> <span class="st">&quot;admin&quot;</span> <span class="at">||</span> roles<span class="at">.</span>contains<span class="at">(</span><span class="st">&quot;c-level&quot;</span><span class="at">))]</span>
 <span class="at">#[</span>get<span class="at">(</span><span class="st">&quot;/path&quot;</span><span class="at">)]</span>
 <span class="kw">fn</span> special_page() -&gt; ...</code></pre></div>
-<p>In this case, I have a handler that takes a <code>PathBuf</code>, performs the token verification, and returns the results of non-routed functions.</p>
-<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="at">#[</span>get<span class="at">(</span><span class="st">&quot;/admin/&lt;pathbuf..&gt;&quot;</span><span class="at">)]</span>
-<span class="kw">fn</span> admin_handler(cookies: &amp;Cookies, pathbuf: PathBuf) -&gt; <span class="dt">Option</span>&lt;Template&gt; {
+<p>In this case, I have a dynamic path for a <code>/admin</code> prefix which performs the token verification, and returns the results of non-routed functions.</p>
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="at">#[</span>get<span class="at">(</span><span class="st">&quot;/admin/&lt;path&gt;&quot;</span><span class="at">)]</span>
+<span class="kw">fn</span> admin_handler(cookies: &amp;Cookies, path: &amp;<span class="dt">str</span>) -&gt; <span class="dt">Option</span>&lt;Template&gt; {
     <span class="kw">let</span> token = <span class="kw">match</span> cookies.find(<span class="st">&quot;jwt&quot;</span>).map(|cookie| cookie.value) {
         <span class="cn">Some</span>(jwt) =&gt; jwt,
         _ =&gt; <span class="kw">return</span> <span class="cn">None</span>,
@@ -147,11 +151,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
     <span class="co">// You&#39;ll want to match on and log errors instead of unwrapping, of course</span>
     <span class="kw">let</span> token_data = decode::&lt;UserRolesToken&gt;(&amp;token, KEY, Algorithm::HS256).unwrap();
 
-    <span class="kw">if</span> !token_data.claims.has_role(<span class="st">&quot;admin&quot;</span>.to_owned()) {
+    <span class="kw">if</span> !token_data.claims.has_role(<span class="st">&quot;admin&quot;</span>) {
         <span class="kw">return</span> <span class="cn">None</span>;
     }
 
-    <span class="kw">let</span> path = pathbuf.to_str().unwrap();
     <span class="kw">match</span> path {
         <span class="st">&quot;index&quot;</span> =&gt; <span class="kw">return</span> <span class="cn">Some</span>(admin_index()),
         <span class="st">&quot;user&quot;</span> =&gt; <span class="kw">return</span> <span class="cn">Some</span>(display_user(token_data.claims.user)),
