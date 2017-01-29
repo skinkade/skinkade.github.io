@@ -1,0 +1,123 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title>Basic 2FA in Rocket</title>
+  <style type="text/css">code{white-space: pre;} pre{line-height: 1.3em;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <link rel="stylesheet" href="../css/solarized-light.min.css" type="text/css" />
+</head>
+<body>
+<h1 id="basic-2fa-in-rocket">Basic 2FA in Rocket</h1>
+<p>Based on a modularized version of <a href="https://skinkade.github.io/rocket-jwt-roles-demo">my last Rocket experiment</a>, I decided to mess around with OTP-based second-factor authentication. How this demo is set up:</p>
+<ul>
+<li>on <code>/create</code>, the user has an option of generating a QR code to be scanned into e.g. <a href="https://freeotp.github.io/">FreeOTP</a></li>
+<li>if the user does this and enters the correct code, the <code>auth_token</code> for the account they’re making is set</li>
+<li>users for whom <code>auth_token IS NOT NULL</code> are required to use their soft tokens</li>
+</ul>
+<p>As with last time, <strong>this is for demonstration purposes only and this code is not to be trusted</strong>.</p>
+<h2 id="time-based-one-time-password-basics">Time-based One-time Password Basics</h2>
+<p>The <a href="https://github.com/google/google-authenticator/wiki/Key-Uri-Format">URI format</a> for TOTP at its most basic is very simple:</p>
+<p><code>otpauth://totp/[username]?secret=[key]</code></p>
+<p>Where <code>key</code> is a base32-encoded string. If you have any spaces or special characters, this will need to be percent-encoded.</p>
+<p>By default, this will be used to generate a six-digit code based on our key and 30-second time intervals using HMAC-SHA1.</p>
+<h2 id="qr-codes">QR codes</h2>
+<p>We can use the <a href="https://github.com/kennytm/qrcode-rust">qrcode crate</a> to render our key URI to an image. Something like…</p>
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">fn</span> gen_qr(key: <span class="dt">String</span>, user: <span class="dt">String</span>) {
+    <span class="kw">let</span> path = <span class="st">&quot;qrcodes/&quot;</span>.to_string() + &amp;key + <span class="st">&quot;.png&quot;</span>;
+
+    <span class="kw">let</span> payload = <span class="st">&quot;otpauth://totp/RocketDemo:&quot;</span>.to_string() + &amp;user + <span class="st">&quot;?secret=&quot;</span> + &amp;key;
+
+    <span class="kw">let</span> qr = QrCode::new(payload.as_bytes()).unwrap();
+    <span class="kw">let</span> image: GrayImage = qr.render().to_image();
+
+    image.save(&amp;path).unwrap();
+}</code></pre></div>
+<p>Instead of saving them to a resolvable location however, for the moment I’m encoding them as a <a href="https://en.wikipedia.org/wiki/Data_URI_scheme">data URI</a>. The demo code for this is ugly and hacky and I’m very welcome to recommendations.</p>
+<h2 id="verifying-otp">Verifying OTP</h2>
+<p>There’s a number of OTP crates. I’m using <a href="https://github.com/breard-r/libreauth">libreauth</a>.</p>
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">fn</span> verify_totp(key: <span class="dt">String</span>, code: <span class="dt">String</span>) -&gt; <span class="dt">bool</span> {
+    <span class="kw">let</span> totp = TOTPBuilder::new()
+                .base32_key(&amp;key)
+                .tolerance(<span class="dv">1</span>) <span class="co">// allows for one period (30s) of clock drift</span>
+                .finalize()
+                .unwrap();
+
+    totp.is_valid(&amp;code)
+}
+
+
+
+<span class="at">#[</span>derive<span class="at">(</span>FromForm<span class="at">)]</span>
+<span class="kw">struct</span> Login {
+    username: <span class="dt">String</span>,
+    password: <span class="dt">String</span>,
+    auth_code: <span class="dt">Option</span>&lt;<span class="dt">String</span>&gt;,
+}
+
+<span class="at">#[</span>post<span class="at">(</span><span class="st">&quot;/login&quot;</span><span class="at">,</span> data<span class="at">=</span><span class="st">&quot;&lt;login_form&gt;&quot;</span><span class="at">)]</span>
+<span class="kw">fn</span> login(cookies: &amp;Cookies, login_form: Form&lt;Login&gt;) -&gt; Redirect {
+    <span class="kw">let</span> login = login_form.get();
+    <span class="co">// input validation and checks</span>
+    <span class="co">// fetch user from db</span>
+
+    <span class="kw">if</span> user.auth_token.is_some() {
+        <span class="kw">let</span> auth_code = <span class="kw">match</span> login.auth_code.clone() {
+            <span class="cn">Some</span>(code) =&gt; code,
+            <span class="cn">None</span> =&gt; <span class="kw">return</span> Redirect::to(<span class="st">&quot;/login&quot;</span>),
+        };
+
+        <span class="kw">if</span> !auth_2fa::verify_topt(user.auth_token.unwrap(), auth_code) {
+            <span class="kw">return</span> Redirect::to(<span class="st">&quot;/login&quot;</span>);
+        }
+    }
+
+    <span class="co">// check more stuff</span>
+    <span class="co">// set cookies appropriately</span>
+
+    Redirect::to(<span class="st">&quot;/&quot;</span>)
+}</code></pre></div>
+<h2 id="code">Code</h2>
+<p>The demo mentioned in the intro can be found <a href="https://github.com/skinkade/rocket-auth-demo">here</a>.</p>
+<h3 id="author">Author</h3>
+<p>Shawn Kinkade — January, 2017</p>
+</body>
+</html>
