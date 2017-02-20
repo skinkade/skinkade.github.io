@@ -1,0 +1,202 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title>Rocket + sodiumoxide = ♥</title>
+  <style type="text/css">code{white-space: pre;} pre{line-height: 1.3em;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <link rel="stylesheet" href="../css/solarized-light.min.css" type="text/css" />
+</head>
+<body>
+<h1 id="rocket-sodiumoxide">Rocket + sodiumoxide = ♥</h1>
+<h3 id="end-to-end-encryption-in-a-rest-api">End-to-end encryption in a REST API</h3>
+<p><em>Disclaimer: I cannot guarantee the safety of the code in this post. Consider this as a proof of concept.</em></p>
+<p>Let’s assume you have a reasonable degree of trust in the TLS setup for your <a href="https://rocket.rs">Rocket</a> application. Nevertheless, whether out of paranoia or auditors, or as a just-in-case precaution, you want to go a step further and use end-to-end encryption for data transfers.</p>
+<p>A safe bet for high-performance, hard-to-mess-up encryption in Rust is <a href="https://github.com/dnaq/sodiumoxide">sodiumoxide</a>. A wrapper for <a href="https://github.com/jedisct1/libsodium">libsodium</a>, <code>sodiumoxide</code> uses the idea of putting data into ‘boxes’, and using the key(s) and a nonce to open and close these boxes. In this case, we’ll be using its asymmetric component, the <code>curve25519xsalsa20poly1305</code> construction. Given Alice’s public key and Bob’s private key, or vice versa, it computes a shared secret, and encrypts data with an authenticated stream cipher.</p>
+<p>There are numerous language bindings to <code>libsodium</code>, as well as to <code>NaCl</code> and <code>tweetnacl</code>, so clients for our service should have no issue there. Likewise, for simplicity and compatibility, let’s use JSON strings with base64-encoded fields. The client will need to send the public key and nonce it used along with the ciphertext. We can represent this as a simple struct, deriving (de)serialize via serde.</p>
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="at">#[</span>derive<span class="at">(</span>Serialize<span class="at">,</span> Deserialize<span class="at">,</span> <span class="bu">Debug</span><span class="at">)]</span>
+<span class="kw">struct</span> CryptoBox {
+    pubkey: <span class="dt">String</span>,
+    nonce: <span class="dt">String</span>,
+    ciphertext: <span class="dt">String</span>,
+}</code></pre></div>
+<h2 id="how-to-handle-keys">How to handle keys</h2>
+<p>This can get tricky. By that I mean it <em>will</em> be tricky for non-trivial setups.</p>
+<p>The simplest way is probably to save a keypair to files and load them in. Then, you simply need to bundle your public key with your application(s).</p>
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="co">// for the constants</span>
+<span class="kw">use</span> sodiumoxide::crypto::box_::*;
+
+<span class="pp">lazy_static!</span> {
+    <span class="kw">static</span> <span class="kw">ref</span> PUBLIC_KEY: [<span class="dt">u8</span>; PUBLICKEYBYTES] = <span class="pp">include_bytes!</span>(<span class="st">&quot;../public.key&quot;</span>);
+    <span class="kw">static</span> <span class="kw">ref</span> SECRET_KEY: [<span class="dt">u8</span>; SECRETKEYBYTES] = <span class="pp">include_bytes!</span>(<span class="st">&quot;../secret.key&quot;</span>);
+}</code></pre></div>
+<p>Ah, but what if you want to change keys? You’d need to update your application. Perhaps key rotation? You could instead bundle your public <em>signing</em> key with your application(s), and have a GET to retrieve the currently-used public key for encryption, signed with the master key.</p>
+<p>But what if there’s going to be a number of users for the service, or you have some niche situation in mind? Another idea, again assuming that we have a reasonable degree of trust in our TLS, is to just have the aforementioned GET for a current public key, and not worry about long-term keys. We could even dynamically generate keys every launch if we wanted.</p>
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust">
+<span class="kw">use</span> sodiumoxide::crypto::box_;
+<span class="kw">use</span> sodiumoxide::crypto::box_::*;
+<span class="kw">use</span> data_encoding::base64;
+
+
+<span class="pp">lazy_static!</span> {
+    <span class="kw">static</span> <span class="kw">ref</span> KEY_PAIR: (PublicKey, SecretKey) = box_::gen_keypair();
+}
+
+
+
+<span class="at">#[</span>get<span class="at">(</span><span class="st">&quot;/pubkey&quot;</span><span class="at">)]</span>
+<span class="kw">fn</span> pubkey() -&gt; <span class="dt">String</span> {
+    base64::encode((*KEY_PAIR).<span class="dv">0.</span>as_ref())
+}</code></pre></div>
+<h2 id="decryption">Decryption</h2>
+<p>Below is my messy implementation of <code>decrypt()</code> for <code>CryptoBox</code>. Again, we have the client’s public key, the message nonce, and ciphertext as base64-encoded strings. We decode these to <code>Vec&lt;u8&gt;</code>, but <code>sodiumoxide</code> requires them to be fixed-length so here I’m just copying the values into arrays. Then, we ‘open’ the ‘box’ with this information and our secret key (here: the second part of our <code>static ref KEY_PAIR</code> tuple).</p>
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">impl</span> CryptoBox {
+    <span class="kw">fn</span> decrypt(&amp;<span class="kw">self</span>) -&gt; <span class="dt">Vec</span>&lt;<span class="dt">u8</span>&gt; {
+        <span class="co">// sodiumoxide needs fixed-length arrays,</span>
+        <span class="co">// not slices</span>
+        <span class="kw">let</span> pubkey_decoded = base64::decode(<span class="kw">self</span>.pubkey.as_bytes()).unwrap();
+        <span class="pp">assert!</span>(pubkey_decoded.len() == PUBLICKEYBYTES);
+
+        <span class="kw">let</span> <span class="kw">mut</span> pubkey_bytes = [<span class="dv">0u8</span>; PUBLICKEYBYTES];
+        <span class="kw">for</span> i <span class="kw">in</span> <span class="dv">0.</span>.PUBLICKEYBYTES {
+            pubkey_bytes[i] = pubkey_decoded[i];
+        }
+
+
+        <span class="kw">let</span> nonce_decoded = base64::decode(<span class="kw">self</span>.nonce.as_bytes()).unwrap();
+        <span class="pp">assert!</span>(nonce_decoded.len() == NONCEBYTES);
+
+        <span class="kw">let</span> <span class="kw">mut</span> nonce_bytes = [<span class="dv">0u8</span>; NONCEBYTES];
+        <span class="kw">for</span> i <span class="kw">in</span> <span class="dv">0.</span>.NONCEBYTES {
+            nonce_bytes[i] = nonce_decoded[i];
+        }
+
+
+        <span class="kw">let</span> pk = PublicKey(pubkey_bytes);
+        <span class="kw">let</span> nonce = Nonce(nonce_bytes);
+        <span class="kw">let</span> ciphertext = base64::decode(<span class="kw">self</span>.ciphertext.as_bytes()).unwrap();
+
+        box_::open(&amp;ciphertext, &amp;nonce, &amp;pk, &amp;(*KEY_PAIR).<span class="dv">1</span>).unwrap()
+    }
+}</code></pre></div>
+<h2 id="passing-data">Passing data</h2>
+<p>This is the really easy part, thanks to Rocket. To define a POST route that takes a JSON-serialized <code>CryptoBox</code>, we just, well, annotate a function as a POST route and have it accept <code>JSON&lt;CryptoBox&gt;</code>. Quite simple, really. As an example, if we send an encrypted string to this route, it’ll return the plaintext.</p>
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="at">#[</span>post<span class="at">(</span><span class="st">&quot;/test&quot;</span><span class="at">,</span> format <span class="at">=</span> <span class="st">&quot;application/json&quot;</span><span class="at">,</span> data <span class="at">=</span> <span class="st">&quot;&lt;cryptobox&gt;&quot;</span><span class="at">)]</span>
+<span class="kw">fn</span> test(cryptobox: JSON&lt;CryptoBox&gt;) -&gt; <span class="dt">String</span> {
+    <span class="kw">let</span> plaintext = cryptobox.<span class="dv">0.</span>decrypt();
+    <span class="dt">String</span>::from_utf8(plaintext).unwrap()
+}</code></pre></div>
+<p>Now, as for sending data, a client will:</p>
+<ul>
+<li>generate its own keypair</li>
+<li>GET the server public key</li>
+<li>encrypt the data</li>
+<li>base64 everything relevant and POST it as JSON</li>
+</ul>
+<p>I found <a href="https://github.com/seanmonstar/reqwest">reqwest</a> nice to use for making a Rust client. It has a very high-level API that lets you just use <code>HashMap</code>s as JSON in your request.</p>
+<p>Below is the code I used to test the above route on a local Rocket instance.</p>
+<div class="sourceCode"><pre class="sourceCode rust"><code class="sourceCode rust"><span class="kw">extern</span> <span class="kw">crate</span> reqwest;
+<span class="kw">use</span> std::io::Read;
+
+<span class="kw">extern</span> <span class="kw">crate</span> data_encoding;
+<span class="kw">use</span> data_encoding::base64;
+
+<span class="kw">extern</span> <span class="kw">crate</span> sodiumoxide;
+<span class="kw">use</span> sodiumoxide::crypto::box_;
+<span class="kw">use</span> sodiumoxide::crypto::box_::*;
+
+<span class="kw">use</span> std::collections::HashMap;
+
+
+
+<span class="kw">fn</span> get_server_key() -&gt; PublicKey {
+    <span class="kw">let</span> <span class="kw">mut</span> response = reqwest::get(<span class="st">&quot;http://localhost:8000/pubkey&quot;</span>)
+        .expect(<span class="st">&quot;Failed to GET server key&quot;</span>);
+    <span class="pp">println!</span>(<span class="st">&quot;{}&quot;</span>, response.status());
+
+    <span class="kw">let</span> <span class="kw">mut</span> buf = <span class="dt">Vec</span>::new();
+    response.read_to_end(&amp;<span class="kw">mut</span> buf)
+        .expect(<span class="st">&quot;Failed to read server public key response&quot;</span>);
+
+    <span class="kw">let</span> pubkey_decoded = base64::decode(&amp;buf).unwrap();
+    <span class="pp">assert!</span>(pubkey_decoded.len() == PUBLICKEYBYTES);
+
+    <span class="kw">let</span> <span class="kw">mut</span> pubkey_bytes = [<span class="dv">0u8</span>; PUBLICKEYBYTES];
+    <span class="kw">for</span> i <span class="kw">in</span> <span class="dv">0.</span>.PUBLICKEYBYTES {
+        pubkey_bytes[i] = pubkey_decoded[i];
+    }
+
+    PublicKey(pubkey_bytes)
+}
+
+
+
+
+<span class="kw">fn</span> main() {
+    sodiumoxide::init();
+
+    <span class="kw">let</span> (local_pk, local_sk) = box_::gen_keypair();
+    <span class="kw">let</span> nonce = box_::gen_nonce();
+    <span class="kw">let</span> srv_pk = get_server_key();
+
+    <span class="kw">let</span> plaintext = b<span class="st">&quot;Hello world!&quot;</span>;
+    <span class="kw">let</span> ciphertext = box_::seal(plaintext, &amp;nonce, &amp;srv_pk, &amp;local_sk);
+
+    <span class="kw">let</span> <span class="kw">mut</span> json = HashMap::new();
+    json.insert(<span class="st">&quot;pubkey&quot;</span>, base64::encode(local_pk.as_ref()));
+    json.insert(<span class="st">&quot;nonce&quot;</span>, base64::encode(nonce.as_ref()));
+    json.insert(<span class="st">&quot;ciphertext&quot;</span>, base64::encode(&amp;ciphertext));
+
+    <span class="kw">let</span> client = reqwest::Client::new().unwrap();
+    <span class="kw">let</span> <span class="kw">mut</span> response = client.post(<span class="st">&quot;http://localhost:8000/test&quot;</span>)
+        .json(&amp;json)
+        .send()
+        .expect(<span class="st">&quot;Test POST failed&quot;</span>);
+
+    <span class="kw">let</span> <span class="kw">mut</span> buf = <span class="dt">String</span>::new();
+    response.read_to_string(&amp;<span class="kw">mut</span> buf).expect(<span class="st">&quot;Failed to read POST response&quot;</span>);
+
+    <span class="pp">println!</span>(<span class="st">&quot;{}&quot;</span>, buf)
+}</code></pre></div>
+<h3 id="author">Author</h3>
+<p>Shawn Kinkade — February, 2017</p>
+</body>
+</html>
