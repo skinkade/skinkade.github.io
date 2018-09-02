@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Shawn's Ramblings | Recursive CTEs: Multi-day schedule entries & conflict detection</title>
+    <link rel="shortcut icon" type="image/png" href="/favicon.png">
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/theme/css/screen.css" type="text/css" />
+    <link rel="stylesheet" href="/theme/css/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="/theme/css/print.css" type="text/css" media="print" />
+    <meta name="generator" content="Pelican" />
+    <meta name="description" content="" />
+    <meta name="author" content="Shawn Kinkade" />
+
+    <meta name="keywords" content="recursive,cte,common table expression" />
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="https://github.com/skinkade">GitHub</a></li>
+            </ul>
+        </nav>
+        <div class="header_box">
+            <h1><a href="/">Shawn's Ramblings</a></h1>
+        </div>
+    </header>
+    <div id="wrapper">
+        <div id="content">            <h4 class="date">Sep 02, 2018</h4>
+
+            <article class="post">
+                <h2 class="title">
+                    <a href="/recursive-ctes-multi-day-schedule-entries-conflict-detection.html" rel="bookmark" title="Permanent Link to &quot;Recursive CTEs: Multi-day schedule entries & conflict detection&quot;">Recursive CTEs: Multi-day schedule entries & conflict detection</a>
+                </h2>
+
+                
+                
+
+                <p>Let's say you have a table of schedule entries for individuals.
+A given entry would of course have a start date and time, and an end date and time.
+Some entries span multiple days.</p>
+<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">dbo</span><span class="p">.</span><span class="n">Person</span> <span class="p">(</span>
+    <span class="n">personId</span> <span class="nb">INT</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span>
+    <span class="n">firstName</span> <span class="n">NVARCHAR</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">lastName</span> <span class="n">NVARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span>
+<span class="p">);</span>
+
+<span class="k">INSERT</span> <span class="n">dbo</span><span class="p">.</span><span class="n">Person</span>
+<span class="k">VALUES</span>
+    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="s1">&#39;Bruce&#39;</span><span class="p">,</span> <span class="n">N</span><span class="s1">&#39;Bardly&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">N</span><span class="s1">&#39;Jess&#39;</span><span class="p">,</span> <span class="n">N</span><span class="s1">&#39;Abracadabra&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">N</span><span class="s1">&#39;Tom&#39;</span><span class="p">,</span> <span class="n">N</span><span class="s1">&#39;Calzone&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">N</span><span class="s1">&#39;Rebecca&#39;</span><span class="p">,</span> <span class="n">N</span><span class="s1">&#39;Malarky&#39;</span><span class="p">);</span>
+
+<span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">dbo</span><span class="p">.</span><span class="n">Schedule</span> <span class="p">(</span>
+    <span class="n">scheduleId</span> <span class="nb">INT</span> <span class="k">PRIMARY</span> <span class="k">KEY</span><span class="p">,</span>
+    <span class="n">personId</span> <span class="nb">INT</span> <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">REFERENCES</span> <span class="n">Person</span><span class="p">(</span><span class="n">personId</span><span class="p">),</span>
+    <span class="n">scheduleDescription</span> <span class="n">NVARCHAR</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">datetimeStart</span> <span class="n">DATETIME</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">datetimeEnd</span> <span class="n">DATETIME</span> <span class="k">NOT</span> <span class="k">NULL</span>
+<span class="p">);</span>
+
+<span class="k">INSERT</span> <span class="n">dbo</span><span class="p">.</span><span class="n">Schedule</span>
+<span class="k">VALUES</span>
+    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="s1">&#39;Roll some dice&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-01 09:00&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-01 10:00&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="s1">&#39;Slay an orc&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-02 09:00&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-02 12:00&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="s1">&#39;Insult a wizard&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-03 12:00&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-03 12:15&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="s1">&#39;Run from a dragon&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-05 18:00&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-05 18:30&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="s1">&#39;Play lute&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-01 09:00&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-07 17:00&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">N</span><span class="s1">&#39;Brew a potion&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-01 09:00&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-02 17:00&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">N</span><span class="s1">&#39;Be insulted by Bruce&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-03 12:00&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-03 12:15&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">N</span><span class="s1">&#39;Practice lightning&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-04 09:00&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-04 12:00&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">9</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">N</span><span class="s1">&#39;Meditate&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-06 22:00&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-07 06:00&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">N</span><span class="s1">&#39;Set some stuff on fire idk&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-04 11:00&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-04 13:00&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">N</span><span class="s1">&#39;Make some pasta&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-01 09:00&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-01 17:00&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">N</span><span class="s1">&#39;Make a pizza&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-03 13:00&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-03 16:00&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">N</span><span class="s1">&#39;Make minestrone&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-01 06:00&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-01 12:00&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">N</span><span class="s1">&#39;Make bruschetta&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-01 09:00&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-01 17:00&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">N</span><span class="s1">&#39;Roast garlic&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-07 09:00&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-07 10:00&#39;</span><span class="p">),</span>
+    <span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">N</span><span class="s1">&#39;Do nothing&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-04 09:00&#39;</span><span class="p">,</span> <span class="s1">&#39;2018-09-07 17:00&#39;</span><span class="p">);</span>
+</pre></div>
+
+
+<p>For the sake of a complete example, let's also say that for certain people,
+you have default start and end times (such as in a 9-5 office environment).</p>
+<div class="highlight"><pre><span></span><span class="k">CREATE</span> <span class="k">TABLE</span> <span class="n">dbo</span><span class="p">.</span><span class="n">DefaultHours</span> <span class="p">(</span>
+    <span class="n">personId</span> <span class="nb">INT</span> <span class="k">NOT</span> <span class="k">NULL</span> <span class="k">REFERENCES</span> <span class="n">Person</span> <span class="p">(</span><span class="n">personId</span><span class="p">),</span>
+    <span class="n">defaultStart</span> <span class="n">TIME</span> <span class="k">NOT</span> <span class="k">NULL</span><span class="p">,</span>
+    <span class="n">defaultEnd</span> <span class="n">TIME</span> <span class="k">NOT</span> <span class="k">NULL</span>
+<span class="p">);</span>
+
+<span class="k">INSERT</span> <span class="n">dbo</span><span class="p">.</span><span class="n">DefaultHours</span>
+<span class="k">VALUES</span> <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="s1">&#39;09:00&#39;</span><span class="p">,</span> <span class="s1">&#39;17:00&#39;</span><span class="p">);</span>
+</pre></div>
+
+
+<p>You want to be able to easily display these on a day-by-day basis (like on a calendar),
+and you want to able to detect conflicting schedule entries.
+The best way I've found to do this it to use a recursive CTE to artificially
+generate rows for 'in-between' days.</p>
+<div class="highlight"><pre><span></span><span class="k">WITH</span> <span class="n">schedCte</span> <span class="k">AS</span> <span class="p">(</span>
+    <span class="k">SELECT</span>
+        <span class="n">scheduleId</span><span class="p">,</span>
+        <span class="n">Schedule</span><span class="p">.</span><span class="n">personId</span><span class="p">,</span>
+        <span class="n">scheduleDescription</span><span class="p">,</span>
+        <span class="k">CAST</span><span class="p">(</span><span class="n">datetimeStart</span> <span class="k">AS</span> <span class="nb">DATE</span><span class="p">)</span> <span class="k">AS</span> <span class="n">schedDate</span><span class="p">,</span>
+        <span class="k">CAST</span><span class="p">(</span><span class="n">datetimeStart</span> <span class="k">AS</span> <span class="n">TIME</span><span class="p">)</span> <span class="k">AS</span> <span class="n">timeStart</span><span class="p">,</span>
+        <span class="k">CAST</span><span class="p">(</span><span class="n">dateTimeEnd</span> <span class="k">AS</span> <span class="nb">DATE</span><span class="p">)</span> <span class="k">AS</span> <span class="n">dateEnd</span><span class="p">,</span>
+        <span class="c1">-- If the entry ends on the same day it starts,</span>
+        <span class="c1">--     this is just a regular entry</span>
+        <span class="c1">-- Else, use the default end time for the user / NULL</span>
+        <span class="k">CASE</span>
+            <span class="k">WHEN</span> <span class="k">CAST</span><span class="p">(</span><span class="n">datetimeStart</span> <span class="k">AS</span> <span class="nb">DATE</span><span class="p">)</span> <span class="o">&lt;&gt;</span> <span class="k">CAST</span><span class="p">(</span><span class="n">dateTimeEnd</span> <span class="k">AS</span> <span class="nb">DATE</span><span class="p">)</span>
+            <span class="k">THEN</span> <span class="n">defaultEnd</span>
+            <span class="k">ELSE</span> <span class="k">CAST</span><span class="p">(</span><span class="n">dateTimeEnd</span> <span class="k">AS</span> <span class="n">TIME</span><span class="p">)</span>
+        <span class="k">END</span> <span class="k">AS</span> <span class="n">timeEnd</span><span class="p">,</span>
+        <span class="k">CAST</span><span class="p">(</span><span class="n">dateTimeEnd</span> <span class="k">AS</span> <span class="n">TIME</span><span class="p">)</span> <span class="k">AS</span> <span class="n">timeEndOrig</span><span class="p">,</span>
+        <span class="n">defaultStart</span><span class="p">,</span>
+        <span class="n">defaultEnd</span>
+    <span class="k">FROM</span> <span class="n">Schedule</span>
+    <span class="k">LEFT</span> <span class="k">JOIN</span> <span class="n">DefaultHours</span>
+        <span class="k">ON</span> <span class="n">Schedule</span><span class="p">.</span><span class="n">personId</span> <span class="o">=</span> <span class="n">DefaultHours</span><span class="p">.</span><span class="n">personId</span>
+
+    <span class="k">UNION</span> <span class="k">ALL</span>
+
+    <span class="k">SELECT</span>
+        <span class="n">scheduleId</span><span class="p">,</span>
+        <span class="n">personId</span><span class="p">,</span>
+        <span class="n">scheduleDescription</span><span class="p">,</span>
+        <span class="n">DATEADD</span><span class="p">(</span><span class="k">DAY</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">schedDate</span><span class="p">)</span> <span class="k">AS</span> <span class="n">dateStart</span><span class="p">,</span>
+        <span class="c1">-- &#39;In-between&#39; / final date record, use default start time</span>
+        <span class="n">defaultStart</span> <span class="k">AS</span> <span class="n">timeStart</span><span class="p">,</span>
+        <span class="n">dateEnd</span><span class="p">,</span>
+        <span class="k">CASE</span>
+            <span class="k">WHEN</span> <span class="n">DATEADD</span><span class="p">(</span><span class="k">DAY</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">schedDate</span><span class="p">)</span> <span class="o">&lt;&gt;</span> <span class="n">dateEnd</span>
+            <span class="k">THEN</span> <span class="n">defaultEnd</span>
+            <span class="k">ELSE</span> <span class="n">timeEndOrig</span>
+        <span class="k">END</span> <span class="k">AS</span> <span class="n">timeEnd</span><span class="p">,</span>
+        <span class="n">timeEndOrig</span><span class="p">,</span>
+        <span class="n">defaultStart</span><span class="p">,</span>
+        <span class="n">defaultEnd</span>
+    <span class="k">FROM</span> <span class="n">schedCte</span>
+    <span class="c1">-- We&#39;re interating thru until all multi-day entries have have their</span>
+    <span class="c1">--     &#39;in-between&#39; days generated, and we&#39;ve reached their dateEnd</span>
+    <span class="k">WHERE</span> <span class="n">schedDate</span> <span class="o">&lt;</span> <span class="n">dateEnd</span>
+<span class="p">)</span>
+
+<span class="k">SELECT</span>
+    <span class="n">CONCAT</span><span class="p">(</span><span class="n">firstName</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="k">SUBSTRING</span><span class="p">(</span><span class="n">lastName</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="k">AS</span> <span class="n">personName</span><span class="p">,</span>
+    <span class="n">schedDate</span><span class="p">,</span>
+    <span class="n">timeStart</span><span class="p">,</span>
+    <span class="n">timeEnd</span><span class="p">,</span>
+    <span class="n">scheduleDescription</span><span class="p">,</span>
+    <span class="c1">-- Fancy: comma-separated descriptions of conflicting entries</span>
+    <span class="k">SUBSTRING</span><span class="p">((</span>
+        <span class="k">SELECT</span> <span class="s1">&#39;= &#39;</span> <span class="o">+</span> <span class="n">s2</span><span class="p">.</span><span class="n">scheduleDescription</span>
+        <span class="k">FROM</span> <span class="n">schedCte</span> <span class="n">s2</span>
+        <span class="k">WHERE</span> <span class="n">s1</span><span class="p">.</span><span class="n">personId</span> <span class="o">=</span> <span class="n">s2</span><span class="p">.</span><span class="n">personId</span>
+            <span class="k">AND</span> <span class="n">s1</span><span class="p">.</span><span class="n">schedDate</span> <span class="o">=</span> <span class="n">s2</span><span class="p">.</span><span class="n">schedDate</span>
+            <span class="c1">-- don&#39;t cause self-conflict</span>
+            <span class="k">AND</span> <span class="n">s1</span><span class="p">.</span><span class="n">scheduleId</span> <span class="o">&lt;&gt;</span> <span class="n">s2</span><span class="p">.</span><span class="n">scheduleId</span>
+            <span class="c1">-- bug: records starting at 00:00 / ending at 23:59 cause issues</span>
+            <span class="k">AND</span> <span class="k">ISNULL</span><span class="p">(</span><span class="n">s1</span><span class="p">.</span><span class="n">timeStart</span><span class="p">,</span> <span class="s1">&#39;00:00&#39;</span><span class="p">)</span> <span class="o">&lt;</span> <span class="k">ISNULL</span><span class="p">(</span><span class="n">s2</span><span class="p">.</span><span class="n">timeEnd</span><span class="p">,</span> <span class="s1">&#39;23:59&#39;</span><span class="p">)</span>
+            <span class="k">AND</span> <span class="k">ISNULL</span><span class="p">(</span><span class="n">s1</span><span class="p">.</span><span class="n">timeEnd</span><span class="p">,</span> <span class="s1">&#39;23:59&#39;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="k">ISNULL</span><span class="p">(</span><span class="n">s2</span><span class="p">.</span><span class="n">timeStart</span><span class="p">,</span> <span class="s1">&#39;00:00&#39;</span><span class="p">)</span>
+        <span class="k">ORDER</span> <span class="k">BY</span> <span class="n">s2</span><span class="p">.</span><span class="n">timeStart</span><span class="p">,</span> <span class="n">s2</span><span class="p">.</span><span class="n">scheduleDescription</span>
+        <span class="k">FOR</span> <span class="n">XML</span> <span class="n">PATH</span> <span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="p">),</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5000</span><span class="p">)</span> <span class="k">AS</span> <span class="n">scheduleConflicts</span>
+<span class="k">FROM</span> <span class="n">schedCte</span> <span class="n">s1</span>
+<span class="k">JOIN</span> <span class="n">Person</span>
+    <span class="k">ON</span> <span class="n">s1</span><span class="p">.</span><span class="n">personId</span> <span class="o">=</span> <span class="n">Person</span><span class="p">.</span><span class="n">personId</span>
+<span class="k">ORDER</span> <span class="k">BY</span> <span class="n">personName</span><span class="p">,</span> <span class="n">schedDate</span><span class="p">,</span> <span class="n">timeStart</span>
+</pre></div>
+
+
+<p><br></p>
+<style>
+table, th, td {
+    border: 1px solid black;
+}
+th, td {
+    padding: 5px;
+    text-align: left;
+}
+table tr:nth-child(even) {
+    background-color: #eee;
+}
+table tr:nth-child(odd) {
+   background-color: #fff;
+}
+table th {
+    background-color: #002b36;
+    color: white;
+}
+</style>
+
+<table>
+<thead>
+<tr>
+<th>personName</th>
+<th>schedDate</th>
+<th>timeStart</th>
+<th>timeEnd</th>
+<th>scheduleDescription</th>
+<th>scheduleConflicts</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Bruce B.</td>
+<td>2018-09-01</td>
+<td>09:00:00</td>
+<td>10:00:00</td>
+<td>Roll some dice</td>
+<td>Play lute</td>
+</tr>
+<tr>
+<td>Bruce B.</td>
+<td>2018-09-01</td>
+<td>09:00:00</td>
+<td>NULL</td>
+<td>Play lute</td>
+<td>Roll some dice</td>
+</tr>
+<tr>
+<td>Bruce B.</td>
+<td>2018-09-02</td>
+<td>NULL</td>
+<td>NULL</td>
+<td>Play lute</td>
+<td>Slay an orc</td>
+</tr>
+<tr>
+<td>Bruce B.</td>
+<td>2018-09-02</td>
+<td>09:00:00</td>
+<td>12:00:00</td>
+<td>Slay an orc</td>
+<td>Play lute</td>
+</tr>
+<tr>
+<td>Bruce B.</td>
+<td>2018-09-03</td>
+<td>NULL</td>
+<td>NULL</td>
+<td>Play lute</td>
+<td>Insult a wizard</td>
+</tr>
+<tr>
+<td>Bruce B.</td>
+<td>2018-09-03</td>
+<td>12:00:00</td>
+<td>12:15:00</td>
+<td>Insult a wizard</td>
+<td>Play lute</td>
+</tr>
+<tr>
+<td>Bruce B.</td>
+<td>2018-09-04</td>
+<td>NULL</td>
+<td>NULL</td>
+<td>Play lute</td>
+<td>NULL</td>
+</tr>
+<tr>
+<td>Bruce B.</td>
+<td>2018-09-05</td>
+<td>NULL</td>
+<td>NULL</td>
+<td>Play lute</td>
+<td>Run from a dragon</td>
+</tr>
+<tr>
+<td>Bruce B.</td>
+<td>2018-09-05</td>
+<td>18:00:00</td>
+<td>18:30:00</td>
+<td>Run from a dragon</td>
+<td>Play lute</td>
+</tr>
+<tr>
+<td>Bruce B.</td>
+<td>2018-09-06</td>
+<td>NULL</td>
+<td>NULL</td>
+<td>Play lute</td>
+<td>NULL</td>
+</tr>
+<tr>
+<td>Bruce B.</td>
+<td>2018-09-07</td>
+<td>NULL</td>
+<td>17:00:00</td>
+<td>Play lute</td>
+<td>NULL</td>
+</tr>
+<tr>
+<td>Jess A.</td>
+<td>2018-09-01</td>
+<td>09:00:00</td>
+<td>NULL</td>
+<td>Brew a potion</td>
+<td>NULL</td>
+</tr>
+<tr>
+<td>Jess A.</td>
+<td>2018-09-02</td>
+<td>NULL</td>
+<td>17:00:00</td>
+<td>Brew a potion</td>
+<td>NULL</td>
+</tr>
+<tr>
+<td>Jess A.</td>
+<td>2018-09-03</td>
+<td>12:00:00</td>
+<td>12:15:00</td>
+<td>Be insulted by Bruce</td>
+<td>NULL</td>
+</tr>
+<tr>
+<td>Jess A.</td>
+<td>2018-09-04</td>
+<td>09:00:00</td>
+<td>12:00:00</td>
+<td>Practice lightning</td>
+<td>Set some stuff on fire idk</td>
+</tr>
+<tr>
+<td>Jess A.</td>
+<td>2018-09-04</td>
+<td>11:00:00</td>
+<td>13:00:00</td>
+<td>Set some stuff on fire idk</td>
+<td>Practice lightning</td>
+</tr>
+<tr>
+<td>Jess A.</td>
+<td>2018-09-06</td>
+<td>22:00:00</td>
+<td>NULL</td>
+<td>Meditate</td>
+<td>NULL</td>
+</tr>
+<tr>
+<td>Jess A.</td>
+<td>2018-09-07</td>
+<td>NULL</td>
+<td>06:00:00</td>
+<td>Meditate</td>
+<td>NULL</td>
+</tr>
+<tr>
+<td>Rebecca M.</td>
+<td>2018-09-04</td>
+<td>09:00:00</td>
+<td>17:00:00</td>
+<td>Do nothing</td>
+<td>NULL</td>
+</tr>
+<tr>
+<td>Rebecca M.</td>
+<td>2018-09-05</td>
+<td>09:00:00</td>
+<td>17:00:00</td>
+<td>Do nothing</td>
+<td>NULL</td>
+</tr>
+<tr>
+<td>Rebecca M.</td>
+<td>2018-09-06</td>
+<td>09:00:00</td>
+<td>17:00:00</td>
+<td>Do nothing</td>
+<td>NULL</td>
+</tr>
+<tr>
+<td>Rebecca M.</td>
+<td>2018-09-07</td>
+<td>09:00:00</td>
+<td>17:00:00</td>
+<td>Do nothing</td>
+<td>NULL</td>
+</tr>
+<tr>
+<td>Tom C.</td>
+<td>2018-09-01</td>
+<td>06:00:00</td>
+<td>12:00:00</td>
+<td>Make minestrone</td>
+<td>Make bruschetta, Make some pasta</td>
+</tr>
+<tr>
+<td>Tom C.</td>
+<td>2018-09-01</td>
+<td>09:00:00</td>
+<td>17:00:00</td>
+<td>Make bruschetta</td>
+<td>Make minestrone, Make some pasta</td>
+</tr>
+<tr>
+<td>Tom C.</td>
+<td>2018-09-01</td>
+<td>09:00:00</td>
+<td>17:00:00</td>
+<td>Make some pasta</td>
+<td>Make minestrone, Make bruschetta</td>
+</tr>
+<tr>
+<td>Tom C.</td>
+<td>2018-09-03</td>
+<td>13:00:00</td>
+<td>16:00:00</td>
+<td>Make a pizza</td>
+<td>NULL</td>
+</tr>
+<tr>
+<td>Tom C.</td>
+<td>2018-09-07</td>
+<td>09:00:00</td>
+<td>10:00:00</td>
+<td>Roast garlic</td>
+<td>NULL</td>
+</tr>
+</tbody>
+</table>
+                <div class="clear"></div>
+
+                <div class="info">
+                    <!-- <a href="/recursive-ctes-multi-day-schedule-entries-conflict-detection.html">posted at 00:00</a> -->
+                    <a href="/category/sql.html" rel="tag">SQL</a>&nbsp;&middot;&nbsp;
+                    <!-- &nbsp;&middot; -->
+                    &nbsp;<a href="/tag/recursive.html" class="tags">recursive</a>
+                    &nbsp;<a href="/tag/cte.html" class="tags">cte</a>
+                    &nbsp;<a href="/tag/common-table-expression.html" class="tags">common table expression</a>
+                </div>
+		<!--  -->
+            </article>
+        </div>
+        <div class="clear"></div>
+    </div>
+</body>
+</html>
