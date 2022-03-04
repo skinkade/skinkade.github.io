@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Why Learn Programming? - A Gentle Introduction to Interactive Programming</title>
+        <title>Windows - A Gentle Introduction to Interactive Programming</title>
 
 
         <!-- Custom HTML head -->
@@ -81,7 +81,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="title-page.html">A Gentle Introduction to Interactive Programming</a></li><li class="chapter-item expanded affix "><a href="ch00-00-introduction.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="ch00-01-why-learn.html" class="active">Why Learn Programming?</a></li><li class="chapter-item expanded affix "><a href="ch00-02-why-clojure.html">Why Clojure?</a></li><li class="chapter-item expanded "><a href="ch01-00-data-code.html"><strong aria-hidden="true">1.</strong> Data &amp; Code</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch01-01-data.html"><strong aria-hidden="true">1.1.</strong> Data Types</a></li><li class="chapter-item expanded "><a href="ch01-02-code.html"><strong aria-hidden="true">1.2.</strong> Calling Code</a></li><li class="chapter-item expanded "><a href="ch01-03-vars.html"><strong aria-hidden="true">1.3.</strong> Variables</a></li><li class="chapter-item expanded "><a href="ch01-04-functions.html"><strong aria-hidden="true">1.4.</strong> Functions</a></li><li class="chapter-item expanded "><a href="ch01-05-practice.html"><strong aria-hidden="true">1.5.</strong> Practice</a></li></ol></li><li class="chapter-item expanded "><a href="ch02-00-editing-dev.html"><strong aria-hidden="true">2.</strong> Editing</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch02-01-windows.html"><strong aria-hidden="true">2.1.</strong> Windows</a></li><li class="chapter-item expanded "><a href="ch02-02-macos-linux.html"><strong aria-hidden="true">2.2.</strong> MacOS &amp; Linux</a></li><li class="chapter-item expanded "><a href="ch02-03-vscode-calva.html"><strong aria-hidden="true">2.3.</strong> VS Code &amp; Calva</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="title-page.html">A Gentle Introduction to Interactive Programming</a></li><li class="chapter-item expanded affix "><a href="ch00-00-introduction.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="ch00-01-why-learn.html">Why Learn Programming?</a></li><li class="chapter-item expanded affix "><a href="ch00-02-why-clojure.html">Why Clojure?</a></li><li class="chapter-item expanded "><a href="ch01-00-data-code.html"><strong aria-hidden="true">1.</strong> Data &amp; Code</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch01-01-data.html"><strong aria-hidden="true">1.1.</strong> Data Types</a></li><li class="chapter-item expanded "><a href="ch01-02-code.html"><strong aria-hidden="true">1.2.</strong> Calling Code</a></li><li class="chapter-item expanded "><a href="ch01-03-vars.html"><strong aria-hidden="true">1.3.</strong> Variables</a></li><li class="chapter-item expanded "><a href="ch01-04-functions.html"><strong aria-hidden="true">1.4.</strong> Functions</a></li><li class="chapter-item expanded "><a href="ch01-05-practice.html"><strong aria-hidden="true">1.5.</strong> Practice</a></li></ol></li><li class="chapter-item expanded "><a href="ch02-00-editing-dev.html"><strong aria-hidden="true">2.</strong> Editing</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch02-01-windows.html" class="active"><strong aria-hidden="true">2.1.</strong> Windows</a></li><li class="chapter-item expanded "><a href="ch02-02-macos-linux.html"><strong aria-hidden="true">2.2.</strong> MacOS &amp; Linux</a></li><li class="chapter-item expanded "><a href="ch02-03-vscode-calva.html"><strong aria-hidden="true">2.3.</strong> VS Code &amp; Calva</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -142,18 +142,73 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="why-learn-programming"><a class="header" href="#why-learn-programming">Why Learn Programming?</a></h1>
-<p>TODO</p>
+                        <h1 id="windows"><a class="header" href="#windows">Windows</a></h1>
+<h2 id="java"><a class="header" href="#java">Java</a></h2>
+<p>Because Clojure runs on the JVM, we need to first install Java.
+There are multiple builds and distributions of Java, however.
+I recommended installing the package 'Temurin 17 (LTS)'
+from <a href="https://adoptium.net/">this page</a>.
+Side note: in software, the acronym 'LTS' refers to a
+<em>long term support</em> release or version.</p>
+<h2 id="clojure"><a class="header" href="#clojure">Clojure</a></h2>
+<p>Official documentation for installing Clojure on Windows is
+<a href="https://github.com/clojure/tools.deps.alpha/wiki/clj-on-Windows">here</a>.</p>
+<p>First, you'll want to search Windows and open up a PowerShell console.
+PowerShell is a combined command console and programming language
+developed by Microsoft for automating tasks on Windows systems.</p>
+<p>Running the following command will set a security policy on your system
+that allows it to run PowerShell scripts, so long as those scripts
+are from a trusted author.
+You'll need this set for Clojure on Windows to function correctly.</p>
+<pre><code>Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+</code></pre>
+<p>Type <code>y</code> and enter.</p>
+<p>Then run the following, which will download Clojure's installer script and run it:</p>
+<pre><code>Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://download.clojure.org/install/win-install-1.10.3.1087.ps1')
+</code></pre>
+<p>When prompted for install location, type <code>1</code> and enter.</p>
+<p>Clojure should now be installed.</p>
+<p><img src="img/win-setup/clj-powershell.png" alt="" /></p>
+<h2 id="leiningen"><a class="header" href="#leiningen">Leiningen</a></h2>
+<p>Setting up leinigen will take a bit of technical know-how.</p>
+<p>First, we'll want to create a new folder where we can place executable files.
+This can be wherever you'd like, but let's say we'll make a folder called
+Programs within our Documents folder.</p>
+<p><img src="img/win-setup/new-programs-folder.png" alt="" /></p>
+<p>Next, search Windows for 'environ' and you'll find a control panel option
+titled 'Edit the environment variables for your account'.</p>
+<p><img src="img/win-setup/search-environment.png" alt="" />
+<img src="img/win-setup/env-var-dialog.png" alt="" /></p>
+<p>Click on 'Path', then 'Edit...'.</p>
+<p>Add a new entry to the dialog, containing the path to the Programs folder we just created.</p>
+<p><img src="img/win-setup/new-env-variable.png" alt="" /></p>
+<p>From step 1 on <a href="https://leiningen.org">the leinigen website</a>, right-click on the link to <code>lein.bat</code>,
+hit 'Save Link As...', and save it to you the Programs folder you made, making sure to change
+the 'Save as type' option to 'All Files'.</p>
+<p><img src="img/win-setup/save-lein.png" alt="" /></p>
+<p>Note: Windows will try to save this as a text file by default.
+If this happens, make sure you can see file extensions by opening
+File Explorer Options, click on the View tab, uncheck
+'Hide extensions for known file types', and hit apply.</p>
+<p><img src="img/win-setup/search-folder-opts.png" alt="" />
+<img src="img/win-setup/show-extensions.png" alt="" /></p>
+<p>Then make make sure, renaming if necessary, that the full file name is <code>lein.bat</code>
+and its type is <code>Windows Batch File</code>.</p>
+<p><img src="img/win-setup/lein-bat.png" alt="" /></p>
+<p>Now, search Windows for 'cmd' and open up the command prompt, and you should be able
+to run <code>lein self-install</code>.</p>
+<p><img src="img/win-setup/search-cmd.png" alt="" />
+<img src="img/win-setup/lein-self-install.png" alt="" /></p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="ch00-00-introduction.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="ch02-00-editing-dev.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next" href="ch00-02-why-clojure.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="ch02-02-macos-linux.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -163,11 +218,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="ch00-00-introduction.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="ch02-00-editing-dev.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next" href="ch00-02-why-clojure.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="ch02-02-macos-linux.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

@@ -82,7 +82,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="title-page.html">A Gentle Introduction to Interactive Programming</a></li><li class="chapter-item expanded affix "><a href="ch00-00-introduction.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="ch00-01-why-learn.html">Why Learn Programming?</a></li><li class="chapter-item expanded affix "><a href="ch00-02-why-clojure.html">Why Clojure?</a></li><li class="chapter-item expanded "><a href="ch01-00-data-code.html"><strong aria-hidden="true">1.</strong> Data &amp; Code</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch01-01-data.html"><strong aria-hidden="true">1.1.</strong> Data Types</a></li><li class="chapter-item expanded "><a href="ch01-02-code.html"><strong aria-hidden="true">1.2.</strong> Calling Code</a></li><li class="chapter-item expanded "><a href="ch01-03-vars.html"><strong aria-hidden="true">1.3.</strong> Variables</a></li><li class="chapter-item expanded "><a href="ch01-04-functions.html"><strong aria-hidden="true">1.4.</strong> Functions</a></li><li class="chapter-item expanded "><a href="ch01-05-practice.html"><strong aria-hidden="true">1.5.</strong> Practice</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="title-page.html">A Gentle Introduction to Interactive Programming</a></li><li class="chapter-item expanded affix "><a href="ch00-00-introduction.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="ch00-01-why-learn.html">Why Learn Programming?</a></li><li class="chapter-item expanded affix "><a href="ch00-02-why-clojure.html">Why Clojure?</a></li><li class="chapter-item expanded "><a href="ch01-00-data-code.html"><strong aria-hidden="true">1.</strong> Data &amp; Code</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch01-01-data.html"><strong aria-hidden="true">1.1.</strong> Data Types</a></li><li class="chapter-item expanded "><a href="ch01-02-code.html"><strong aria-hidden="true">1.2.</strong> Calling Code</a></li><li class="chapter-item expanded "><a href="ch01-03-vars.html"><strong aria-hidden="true">1.3.</strong> Variables</a></li><li class="chapter-item expanded "><a href="ch01-04-functions.html"><strong aria-hidden="true">1.4.</strong> Functions</a></li><li class="chapter-item expanded "><a href="ch01-05-practice.html"><strong aria-hidden="true">1.5.</strong> Practice</a></li></ol></li><li class="chapter-item expanded "><a href="ch02-00-editing-dev.html"><strong aria-hidden="true">2.</strong> Editing</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch02-01-windows.html"><strong aria-hidden="true">2.1.</strong> Windows</a></li><li class="chapter-item expanded "><a href="ch02-02-macos-linux.html"><strong aria-hidden="true">2.2.</strong> MacOS &amp; Linux</a></li><li class="chapter-item expanded "><a href="ch02-03-vscode-calva.html"><strong aria-hidden="true">2.3.</strong> VS Code &amp; Calva</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -183,7 +183,9 @@ as a whole.</p>
 for one key reason: it is extremely interactive. As we will get to,
 developing in Clojure allows you to get instant feedback on (almost)
 all your code, allowing you to rapidly check your work. This also makes
-it a great language for just playing around and experimenting in.</p>
+it a great language for just playing around and experimenting in.
+On top of all that, I and many other feels that Clojure is just plain
+<em>enjoyable</em> and <em>fun</em>.</p>
 <p>* <em>syntax</em> refers to the structure of code and how it's written</p>
 <h2 id="what-can-you-do-with-clojure"><a class="header" href="#what-can-you-do-with-clojure">What can you do with Clojure?</a></h2>
 <p>Every programming language has one or several things that it's particularly
@@ -194,14 +196,16 @@ and business applications, as well as more simple utilities.
 Clojure is excellent for just about anything involving processing and manipulation of <strong>data</strong>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="data--code"><a class="header" href="#data--code">Data &amp; Code</a></h1>
 <p>There are two primary elements we deal with when programming:
-data and code.</p>
+data and code*.</p>
 <p>Data is any piece of digital information, and can take many forms.
 This could be a spreadsheet of accounting information, a digital photograph,
 an MP3 music file, or just some plain text.</p>
 <p>Code is the actual instructions to be executed by a computer.
 It runs the tax calculations on the accounting spreadsheet,
 applies an effect to the photograph, boosts the bass of the MP3,
-and runs linguistic analysis on the text.</p>
+and runs spell checking on the text.</p>
+<p>* Clojure and its sibling languages actually allow you to blend code and data
+together in amazing ways - which you'll experience with intermediate-level Clojure.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="data-types"><a class="header" href="#data-types">Data Types</a></h1>
 <p>Data can take the form of either single, individual values, or
 structures which can contain more than one value.</p>
@@ -254,7 +258,7 @@ with a single quote at the beginning:</p>
 <pre><code>'(1 2 3 4 5)
 </code></pre>
 <p>* <em>literal</em> means the way of writing a constant value</p>
-<p>We'll get to why that single quote is necessary when we cover syntax.</p>
+<p>We'll get to why that single quote is necessary when we cover syntax more in depth.</p>
 <p>The basic difference between lists and vectors is:</p>
 <ul>
 <li>lists are fast to add items to, but slow to find a specific item</li>
@@ -473,6 +477,116 @@ isn't part of the function's input.</p>
 <script
   src="https://storage.googleapis.com/app.klipse.tech/plugin/js/klipse_plugin.js">
 </script>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="editing--development"><a class="header" href="#editing--development">Editing &amp; Development</a></h1>
+<p>Programmers rarely use basic text editors.
+Instead, we use <em>integrated development environments</em> (IDEs),
+full of tools and features that making programming easy and more productive.</p>
+<p>Recently, Visual Studio Code has become arguably the most popular free IDE.
+There are numerous plugins for VS Code that extend its functionality,
+including <em>Calva</em> - the de facto Clojure plugin for this IDE.</p>
+<p>The development setup that we'll be configuring in this book
+consists of VS Code + the Calva plugin, and a few other components.</p>
+<h2 id="java"><a class="header" href="#java">Java</a></h2>
+<p>Let's take this moment to mention how Clojure actually runs.
+Programming languages provide a human-readable way of providing
+instructions to computers, and the code you write is <em>compiled</em>
+down to a lower level of operations to eventually run on hardware.
+Some languages compile directly to <em>machine code</em> for this purpose.</p>
+<p>Clojure, however, targets <em>language platforms</em>, primarily the
+<strong>Java Virtual Machine</strong> (JVM).
+The JVM was originally written for the Java programming language
+- a language we'll be repeatedly referencing throughout this book.
+Not only is the JVM a robust, high-performance platform for running software,
+there's a huge number of Java software components
+- called <em>libraries</em> - that Clojure
+automatically gains access to by being on the JVM.</p>
+<p>To be able to run Clojure and other JVM software, however,
+we need to install Java and the JVM separately.</p>
+<h2 id="leiningen"><a class="header" href="#leiningen">Leiningen</a></h2>
+<p>When we develop software, we don't operate on just one file of code.
+Our code is broken up into pieces across files and folders,
+forming a <em>codebase</em> within a <em>project</em>.
+We also don't write everything ourselves.
+As mentioned, there are numerous pre-built software components freely
+available to us, written in Clojure or Java, which we can
+require and include as <em>dependencies</em>.</p>
+<p>We therefore need a project build tool, to be able to
+build our codebase as a single piece of software
+(or even multiple components),
+as well as to manage our dependencies.</p>
+<p>The de facto tool for this in the Clojure space is <em>leiningen</em>,
+which we will also install and be using in our examples.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="windows"><a class="header" href="#windows">Windows</a></h1>
+<h2 id="java-1"><a class="header" href="#java-1">Java</a></h2>
+<p>Because Clojure runs on the JVM, we need to first install Java.
+There are multiple builds and distributions of Java, however.
+I recommended installing the package 'Temurin 17 (LTS)'
+from <a href="https://adoptium.net/">this page</a>.
+Side note: in software, the acronym 'LTS' refers to a
+<em>long term support</em> release or version.</p>
+<h2 id="clojure"><a class="header" href="#clojure">Clojure</a></h2>
+<p>Official documentation for installing Clojure on Windows is
+<a href="https://github.com/clojure/tools.deps.alpha/wiki/clj-on-Windows">here</a>.</p>
+<p>First, you'll want to search Windows and open up a PowerShell console.
+PowerShell is a combined command console and programming language
+developed by Microsoft for automating tasks on Windows systems.</p>
+<p>Running the following command will set a security policy on your system
+that allows it to run PowerShell scripts, so long as those scripts
+are from a trusted author.
+You'll need this set for Clojure on Windows to function correctly.</p>
+<pre><code>Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+</code></pre>
+<p>Type <code>y</code> and enter.</p>
+<p>Then run the following, which will download Clojure's installer script and run it:</p>
+<pre><code>Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://download.clojure.org/install/win-install-1.10.3.1087.ps1')
+</code></pre>
+<p>When prompted for install location, type <code>1</code> and enter.</p>
+<p>Clojure should now be installed.</p>
+<p><img src="img/win-setup/clj-powershell.png" alt="" /></p>
+<h2 id="leiningen-1"><a class="header" href="#leiningen-1">Leiningen</a></h2>
+<p>Setting up leinigen will take a bit of technical know-how.</p>
+<p>First, we'll want to create a new folder where we can place executable files.
+This can be wherever you'd like, but let's say we'll make a folder called
+Programs within our Documents folder.</p>
+<p><img src="img/win-setup/new-programs-folder.png" alt="" /></p>
+<p>Next, search Windows for 'environ' and you'll find a control panel option
+titled 'Edit the environment variables for your account'.</p>
+<p><img src="img/win-setup/search-environment.png" alt="" />
+<img src="img/win-setup/env-var-dialog.png" alt="" /></p>
+<p>Click on 'Path', then 'Edit...'.</p>
+<p>Add a new entry to the dialog, containing the path to the Programs folder we just created.</p>
+<p><img src="img/win-setup/new-env-variable.png" alt="" /></p>
+<p>From step 1 on <a href="https://leiningen.org">the leinigen website</a>, right-click on the link to <code>lein.bat</code>,
+hit 'Save Link As...', and save it to you the Programs folder you made, making sure to change
+the 'Save as type' option to 'All Files'.</p>
+<p><img src="img/win-setup/save-lein.png" alt="" /></p>
+<p>Note: Windows will try to save this as a text file by default.
+If this happens, make sure you can see file extensions by opening
+File Explorer Options, click on the View tab, uncheck
+'Hide extensions for known file types', and hit apply.</p>
+<p><img src="img/win-setup/search-folder-opts.png" alt="" />
+<img src="img/win-setup/show-extensions.png" alt="" /></p>
+<p>Then make make sure, renaming if necessary, that the full file name is <code>lein.bat</code>
+and its type is <code>Windows Batch File</code>.</p>
+<p><img src="img/win-setup/lein-bat.png" alt="" /></p>
+<p>Now, search Windows for 'cmd' and open up the command prompt, and you should be able
+to run <code>lein self-install</code>.</p>
+<p><img src="img/win-setup/search-cmd.png" alt="" />
+<img src="img/win-setup/lein-self-install.png" alt="" /></p>
+<div style="break-before: page; page-break-before: always;"></div><h2 id="macos"><a class="header" href="#macos">MacOS</a></h2>
+<p>TODO</p>
+<h2 id="linux"><a class="header" href="#linux">Linux</a></h2>
+<p>TODO</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="calva"><a class="header" href="#calva">Calva</a></h1>
+<p>Once VS Code is installed, open Code, navigate to the <code>Extensions</code> tab,
+and search for plus install Calva.</p>
+<p><img src="img/vscode-calva-extension-search.png" alt="" /></p>
+<p>After installing Calva, go to <code>View &gt; Command Palette</code>.
+With a search in this command palette, you should see a command titled
+'Calva: Fire up the &quot;Getting Started&quot; REPL'.</p>
+<p><img src="img/vscode-calva-getting-started-search.png" alt="" /></p>
+<p>A whole lot should happen!</p>
+<p>TODO: a whole lotta explainin'</p>
 
                     </main>
 
