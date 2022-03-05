@@ -176,6 +176,20 @@ similarly to <code>nth</code>, but does not throw an error, instead returning <c
 <p>Now is a good time to introduce the concept of <em>null values</em>,
 called <em>nils</em> in Clojure. As opposed to the number 0 representing
 zero of <em>something</em>, a <em>null</em> is the complete absence of a value.</p>
+<h2 id="adding-elements"><a class="header" href="#adding-elements">Adding Elements</a></h2>
+<p>To add an element to a list or vectors, we <strong>conj</strong>oin the
+element to the collection with the <code>conj</code> function.
+An interesting note: when we add an element to a vector,
+it's added to the end.
+When we add an element to a list, it's added to the beginning.</p>
+<pre><code class="language-klipse">(conj [1 2 3] 4)
+</code></pre>
+<pre><code class="language-klipse">(conj '(1 2 3) 4)
+</code></pre>
+<p>To combine two lists or vectors into one, we <strong>concat</strong>enate them
+with the <code>concat</code> function.</p>
+<pre><code class="language-klipse">(concat [1 2] [3 4])
+</code></pre>
 <h2 id="generating"><a class="header" href="#generating">Generating</a></h2>
 <p>Let's create some data of our own, shall we?
 Suppose we want to create a list of numbers from 1 to 10.
@@ -187,7 +201,7 @@ which has the form:</p>
 <pre><code class="language-klipse">(range 1 10)
 </code></pre>
 <p>Ah, almost! One gotcha here is that the end of the range is <em>exclusive</em>,
-that is, it excludes the number.
+that is, it excludes the number itself.
 This means that the end of our range actually has to be one higher
 than the end number we want:</p>
 <pre><code class="language-klipse">(range 1 11)
@@ -200,7 +214,7 @@ Clojure has the <code>repeat</code> function for that:</p>
 </code></pre>
 <h3 id="infinite-lists"><a class="header" href="#infinite-lists">Infinite Lists</a></h3>
 <p>Through Clojure, we can harness the power of infinity!... in a way.
-Clojure as many list functions which generate <em>infinite sequences</em>
+Clojure has many list functions which generate <em>infinite sequences</em>
 that you can <code>take</code> however many items you want from.
 The <code>take</code> function has the form:</p>
 <pre><code>(take count collection)
@@ -332,9 +346,13 @@ of items in order for this to display without issue in our editor.</p>
   [s]
   (str s &quot;*&quot;))
 
-(def stars (iterate add-star &quot;*&quot;))
+(def stars
+  (iterate add-star &quot;*&quot;))
 
-(take 5 stars)
+(def five-stars
+  (take 5 stars))
+
+five-stars
 </code></pre>
 <p>We're almost there!
 We just need to print each item as a line with <code>doseq</code> and <code>println</code>.</p>
@@ -345,7 +363,10 @@ We just need to print each item as a line with <code>doseq</code> and <code>prin
 (def stars
   (iterate add-star &quot;*&quot;))
 
-(doseq [star-line (take 5 stars)]
+(def five-stars
+  (take 5 stars))
+
+(doseq [star-line five-stars]
   (println star-line))
 </code></pre>
 <script
