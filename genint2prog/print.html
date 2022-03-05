@@ -82,7 +82,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="title-page.html">A Gentle Introduction to Interactive Programming</a></li><li class="chapter-item expanded affix "><a href="ch00-00-introduction.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="ch00-01-why-learn.html">Why Learn Programming?</a></li><li class="chapter-item expanded affix "><a href="ch00-02-why-clojure.html">Why Clojure?</a></li><li class="chapter-item expanded "><a href="ch01-00-data-code.html"><strong aria-hidden="true">1.</strong> Data &amp; Code</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch01-01-data.html"><strong aria-hidden="true">1.1.</strong> Data Types</a></li><li class="chapter-item expanded "><a href="ch01-02-code.html"><strong aria-hidden="true">1.2.</strong> Calling Code</a></li><li class="chapter-item expanded "><a href="ch01-03-vars.html"><strong aria-hidden="true">1.3.</strong> Variables</a></li><li class="chapter-item expanded "><a href="ch01-04-functions.html"><strong aria-hidden="true">1.4.</strong> Functions</a></li><li class="chapter-item expanded "><a href="ch01-05-practice.html"><strong aria-hidden="true">1.5.</strong> Practice</a></li></ol></li><li class="chapter-item expanded "><a href="ch02-00-editing-dev.html"><strong aria-hidden="true">2.</strong> Editing</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch02-01-windows.html"><strong aria-hidden="true">2.1.</strong> Windows</a></li><li class="chapter-item expanded "><a href="ch02-02-macos-linux.html"><strong aria-hidden="true">2.2.</strong> MacOS &amp; Linux</a></li><li class="chapter-item expanded "><a href="ch02-03-vscode-calva.html"><strong aria-hidden="true">2.3.</strong> VS Code &amp; Calva</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="title-page.html">A Gentle Introduction to Interactive Programming</a></li><li class="chapter-item expanded affix "><a href="ch00-00-introduction.html">Introduction</a></li><li class="chapter-item expanded affix "><a href="ch00-01-why-learn.html">Why Learn Programming?</a></li><li class="chapter-item expanded affix "><a href="ch00-02-why-clojure.html">Why Clojure?</a></li><li class="chapter-item expanded "><a href="ch01-00-data-code.html"><strong aria-hidden="true">1.</strong> Data &amp; Code</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch01-01-data.html"><strong aria-hidden="true">1.1.</strong> Data Types</a></li><li class="chapter-item expanded "><a href="ch01-02-code.html"><strong aria-hidden="true">1.2.</strong> Calling Code</a></li><li class="chapter-item expanded "><a href="ch01-03-vars.html"><strong aria-hidden="true">1.3.</strong> Variables</a></li><li class="chapter-item expanded "><a href="ch01-04-functions.html"><strong aria-hidden="true">1.4.</strong> Functions</a></li><li class="chapter-item expanded "><a href="ch01-05-practice.html"><strong aria-hidden="true">1.5.</strong> Practice</a></li></ol></li><li class="chapter-item expanded "><a href="ch02-00-editing-dev.html"><strong aria-hidden="true">2.</strong> Editing</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch02-01-windows.html"><strong aria-hidden="true">2.1.</strong> Windows</a></li><li class="chapter-item expanded "><a href="ch02-02-macos-linux.html"><strong aria-hidden="true">2.2.</strong> MacOS &amp; Linux</a></li><li class="chapter-item expanded "><a href="ch02-03-vscode-calva.html"><strong aria-hidden="true">2.3.</strong> VS Code &amp; Calva</a></li></ol></li><li class="chapter-item expanded "><a href="ch03-00-interactive-dev.html"><strong aria-hidden="true">3.</strong> Interactive Development</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch03-01-lists-vectors.html"><strong aria-hidden="true">3.1.</strong> Lists &amp; Vectors</a></li><li class="chapter-item expanded "><a href="ch03-02-maps.html"><strong aria-hidden="true">3.2.</strong> Maps</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -297,6 +297,8 @@ conventionally we put each pair on its own line.</p>
  12 &quot;Dec&quot;}
 </code></pre>
 <p>* <em>lookup tables</em> are convenient ways of converting one value to another</p>
+<p>In Clojure, lists, vectors and maps all fall under
+the category of <strong>collection</strong>.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="calling-code"><a class="header" href="#calling-code">Calling Code</a></h1>
 <link
   rel="stylesheet"
@@ -408,6 +410,23 @@ value we pass in.</p>
 
 (add-ten 5)
 </code></pre>
+<h2 id="functions-as-data"><a class="header" href="#functions-as-data">Functions as Data</a></h2>
+<p>And now for something magical: in Clojure, code...
+is <em>also data!</em>
+Fundamentally, we can also define a function using a regular <code>def</code>:</p>
+<pre><code class="language-klipse">(def add-ten
+  (fn [x]
+      (+ 10 x)))
+
+(add-ten 5)
+</code></pre>
+<p>The form <code>(fn *args* *body*)</code> is known as an <em>anonymous function</em>
+- a function without a name we can call it by.
+In the above code, we use <code>def</code> to give a name to function.
+In reality, the <code>defn</code> operation is actually a <em>wrapper</em>* around
+<code>def</code> and <code>fn</code>, with some other features baked in that we'll get to later.</p>
+<p>* <em>wrappers</em> are pieces of code that combine some other components,
+usually in a simplified way</p>
 <script
   src="https://storage.googleapis.com/app.klipse.tech/plugin/js/klipse_plugin.js">
 </script>
@@ -481,7 +500,7 @@ isn't part of the function's input.</p>
 <p>Programmers rarely use basic text editors.
 Instead, we use <em>integrated development environments</em> (IDEs),
 full of tools and features that making programming easy and more productive.</p>
-<p>Recently, Visual Studio Code has become arguably the most popular free IDE.
+<p>Visual Studio Code has quickly become the most popular free IDE.
 There are numerous plugins for VS Code that extend its functionality,
 including <em>Calva</em> - the de facto Clojure plugin for this IDE.</p>
 <p>The development setup that we'll be configuring in this book
@@ -587,6 +606,217 @@ With a search in this command palette, you should see a command titled
 <p><img src="img/vscode-calva-getting-started-search.png" alt="" /></p>
 <p>A whole lot should happen!</p>
 <p>TODO: a whole lotta explainin'</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="interactive-development"><a class="header" href="#interactive-development">Interactive Development</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="lists--vectors"><a class="header" href="#lists--vectors">Lists &amp; Vectors</a></h1>
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="https://storage.googleapis.com/app.klipse.tech/css/codemirror.css">
+<script>
+    window.klipse_settings = {
+        selector: '.language-klipse'
+    };
+</script>
+<h2 id="finding-elements"><a class="header" href="#finding-elements">Finding Elements</a></h2>
+<p>Clojure has convenience functions such as <code>first</code> and <code>second</code>
+to retrieve items from a collection:</p>
+<pre><code class="language-klipse">(second [1 2 3])
+</code></pre>
+<p>More generally however, specific items can be retrieved using
+the <code>nth</code> function (as in: 1st, 2nd, 3rd ... <em>nth</em>).
+It has the form:</p>
+<pre><code>(nth collection index)
+</code></pre>
+<p>Remember that indexes start at 0, not 1, so if we want to grab
+the 3rd element, we need to retrieve index 2:</p>
+<pre><code class="language-klipse">(nth [1 2 3] 2)
+</code></pre>
+<p><code>nth</code> will throw an error if you try to retrieve an index that doesn't exist:</p>
+<pre><code class="language-klipse">(nth [1 2 3] 10)
+</code></pre>
+<p>There's also the <code>get</code> function, which in this instance functions
+similarly to <code>nth</code>, but does not throw an error, instead returning <code>nil</code>.</p>
+<pre><code class="language-klipse">(get [1 2 3] 10)
+</code></pre>
+<p>Now is a good time to introduce the concept of <em>null values</em>,
+called <em>nils</em> in Clojure. As opposed to the number 0 representing
+zero of <em>something</em>, a <em>null</em> is the complete absence of a value.</p>
+<h2 id="generating"><a class="header" href="#generating">Generating</a></h2>
+<p>Let's create some data of our own, shall we?
+Suppose we want to create a list of numbers from 1 to 10.
+Clojure has a very useful function called <code>range</code>,
+which has the form:</p>
+<pre><code>(range start end)
+</code></pre>
+<p>Let's see what we get...</p>
+<pre><code class="language-klipse">(range 1 10)
+</code></pre>
+<p>Ah, almost! One gotcha here is that the end of the range is <em>exclusive</em>,
+that is, it excludes the number.
+This means that the end of our range actually has to be one higher
+than the end number we want:</p>
+<pre><code class="language-klipse">(range 1 11)
+</code></pre>
+<p>What if we want a list of 10 fives?
+Clojure has the <code>repeat</code> function for that:</p>
+<pre><code>(repeat count value)
+</code></pre>
+<pre><code class="language-klipse">(repeat 10 5)
+</code></pre>
+<h3 id="infinite-lists"><a class="header" href="#infinite-lists">Infinite Lists</a></h3>
+<p>Through Clojure, we can harness the power of infinity!... in a way.
+Clojure as many list functions which generate <em>infinite sequences</em>
+that you can <code>take</code> however many items you want from.
+The <code>take</code> function has the form:</p>
+<pre><code>(take count collection)
+</code></pre>
+<p>These infinite sequences don't actually generate their values all at once.
+Doing so would cause a computer to run out of memory.
+These sequences are <em>lazy</em> - they only generate values when those
+values are requested.</p>
+<p><code>repeat</code> actually has a different form without a parameter
+to specify a count of items to return:</p>
+<pre><code>(repeat value)
+</code></pre>
+<p>In this instance, it will return an infinite sequences of value.
+If you were to evaluate this by itself in your REPL, it would print
+a huge number of values and cause issues with your editor.</p>
+<p>To get a list of 10 fives, we could have also written:</p>
+<pre><code class="language-klipse">(take 10 (repeat 5))
+</code></pre>
+<p>Important note: here you can see that we can pass the result of evaluating
+a function as the argument of another function.</p>
+<h2 id="manipulation--functions-as-arguments"><a class="header" href="#manipulation--functions-as-arguments">Manipulation &amp; Functions as Arguments</a></h2>
+<p>Functions in Clojure are <em>first-class</em>,
+meaning they can be treated just like pieces of data.
+<em>This includes being passed as arguments to other functions!</em></p>
+<p>Many core functions in Clojure take other functions as their arguments.
+Often, these argument functions are used by calling function to somehow
+manipulate a collection of data.</p>
+<p>Before we discuss one such function, I'd like to get a potential source of
+confusion out of the way. Clojure has data structures called <em>(hash) maps</em>,
+and it also has a function called <code>map</code>, which are different things.</p>
+<p>The <code>map</code> function has the form:</p>
+<pre><code>(map function collection)
+</code></pre>
+<p>It takes a function as its first input argument, which will be applied to each element
+of its second input argument, a collection of data.
+You can think of this as <em>mapping over</em> the data with some operation.</p>
+<p>Let's take for an example the helper function <code>inc</code>.
+Its name is short for <em>increment</em>, as in, adding 1 to a value.
+When use <code>map</code> to apply <code>inc</code> to each value in a collection, we get...</p>
+<pre><code class="language-klipse">(map inc [1 2 3 4])
+</code></pre>
+<p>We showed in <a href="ch01-04-functions.html">chapter 1.4</a> how to define
+our own functions, both named and anonymous.</p>
+<p>Let's pass in a custom function into <code>map</code>:</p>
+<pre><code class="language-klipse">(defn times-ten
+  [x]
+  (* 10 x))
+
+(map times-ten [1 2 3 4])
+</code></pre>
+<p>But remember, a function doesn't need to have a name.
+Instead of pre-defining a named function, we can also give <code>map</code>
+an anonymous function in-place using <code>fn</code>:</p>
+<pre><code class="language-klipse">(map (fn [x] (* 10 x))
+     [1 2 3 4])
+</code></pre>
+<h3 id="generation-follow-up"><a class="header" href="#generation-follow-up">Generation Follow-up</a></h3>
+<p>Earlier, to generate a list of 1 through 10, we could have also generated an
+infinite list with the function <code>iterate</code>:</p>
+<pre><code>(iterate function value)
+</code></pre>
+<p>Given a starting value <code>x</code> and a function <code>f</code>, it will return an infinite
+sequence of <code>x</code>, <code>(f x)</code>, <code>(f (f x))</code>, and so on.</p>
+<p>If we pick a starting value of 1, and use the funtion <code>inc</code> to increment
+each item in the sequence, we should get 1, 2, 3, and so on.
+Then we just need to <code>take</code> 10 items from the sequence.</p>
+<pre><code class="language-klipse">(take 10 (iterate inc 1))
+</code></pre>
+<h2 id="printing-each-item"><a class="header" href="#printing-each-item">Printing Each Item</a></h2>
+<p>What if you want to do something to each item in a collection,
+but you don't care what the result is?
+Say for instance that you just want to display each value.</p>
+<p>First you'll need to know the function <code>println</code>, which takes
+one or more pieces of data, and prints a line in a console
+containing the <em>human-readable</em> version of that data.</p>
+<p>We can combine that with the function <code>doseq</code>, which <strong>do</strong>es something
+to each item in a <strong>seq</strong>uence:</p>
+<pre><code class="language-klipse">(doseq [item [1 2 3 4]]
+  (println item))
+</code></pre>
+<p>A lot going on there in just two lines!
+Something brand new is the first argument, <code>[item [1 2 3 4]]</code>.
+<code>doseq</code> uses this form to <em>bind</em> each value in <code>[1 2 3 4]</code> to
+the variable <code>item</code>.
+Then for each of these items, it evaluates <code>(println items)</code>.</p>
+<p>You'll also notice that the editor printed <code>nil</code> at the end.
+In Clojure, every evaluation has to return <em>something</em>,
+and if it doesn't return something, it will default to returning <code>nil</code>.</p>
+<h2 id="a-challenge"><a class="header" href="#a-challenge">A Challenge</a></h2>
+<p>If you're ready, the following is a challenge that combines everything
+we've learned so far, and introduce several more things.</p>
+<p>Let's say we want display the following:</p>
+<pre><code>*
+**
+***
+****
+*****
+</code></pre>
+<p>What may seem simple is actually a bit tricky.
+What is it that we need to do here?</p>
+<p>Here's what we'll do:</p>
+<ul>
+<li>write a function that adds a '*' character to a string,
+in order to &quot;grow&quot; a string of stars</li>
+<li>generate a sequence of &quot;growing&quot; star strings</li>
+<li>take elements from this sequence</li>
+<li>print each element</li>
+</ul>
+<p>Are you ready? Let's begin.</p>
+<p>First, we need a function to &quot;grow&quot; our star strings.
+We can use the function <code>str</code>, short for string, which takes
+any number of arguments and combines them together into a single string.</p>
+<pre><code class="language-klipse">(str &quot;a&quot; 1 &quot;b&quot; 2)
+</code></pre>
+<pre><code class="language-klipse">(defn add-star
+  [s]
+  (str s &quot;*&quot;))
+
+(add-star &quot;*&quot;)
+</code></pre>
+<p>Hey, two stars!</p>
+<p>Now we need to generate a growing sequence.
+We can use <code>iterate</code>, passing in our <code>add-star</code> function, with <code>&quot;*&quot;</code>
+as the starting value.
+Let's save this sequence to a variable called <code>stars</code>.</p>
+<p>Remember, this sequence in infinite, so we need to <code>take</code> a number
+of items in order for this to display without issue in our editor.</p>
+<pre><code class="language-klipse">(defn add-star
+  [s]
+  (str s &quot;*&quot;))
+
+(def stars (iterate add-star &quot;*&quot;))
+
+(take 5 stars)
+</code></pre>
+<p>We're almost there!
+We just need to print each item as a line with <code>doseq</code> and <code>println</code>.</p>
+<pre><code class="language-klipse">(defn add-star
+  [s]
+  (str s &quot;*&quot;))
+
+(def stars
+  (iterate add-star &quot;*&quot;))
+
+(doseq [star-line (take 5 stars)]
+  (println star-line))
+</code></pre>
+<script
+  src="https://storage.googleapis.com/app.klipse.tech/plugin/js/klipse_plugin.js">
+</script>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="maps"><a class="header" href="#maps">Maps</a></h1>
 
                     </main>
 
