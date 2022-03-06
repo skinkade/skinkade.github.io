@@ -144,18 +144,15 @@
                     <main>
                         <h1 id="data-types"><a class="header" href="#data-types">Data Types</a></h1>
 <p>Data can take the form of either single, individual values, or
-structures which can contain more than one value.</p>
-<h2 id="scalar-values"><a class="header" href="#scalar-values">Scalar values</a></h2>
-<p>The technical term for a piece of data that cannot be broken down any further
-is a <strong>scalar</strong>.
-We'll now go over the fundamental scalar types available to us in Clojure.</p>
+structures which can contain more than one value.
+Data can also be broken down into categories,
+which are called <code>types</code>.
+These types are related to how a piece of data is stored
+in the computer's memory.
+This section explains some of Clojure's core data types.</p>
 <h3 id="numbers"><a class="header" href="#numbers">Numbers</a></h3>
-<p>There are two important things to note about numbers in computing:</p>
-<ul>
-<li>there is a distinction between numbers with or without a decimal point</li>
-<li>the data types that hold numeric values have sizes, which determine how big a number they can represent <em>(is this relevant to a beginner?)</em></li>
-</ul>
-<p>We'll address these points in more detail later on.
+<p>In computering, there is a distinction between whole numbers
+and numbers with trailing decimal places.
 For now, know that whole numbers without a decimal point are called <strong>integers</strong>,
 such as <code>1</code>, <code>100</code>, or <code>9841098</code>; and numbers with decimal points are called <strong>floats</strong>,
 such as <code>3.14</code> or <code>81.9841</code>.</p>
@@ -167,50 +164,45 @@ a digit, or special character.</p>
 <p>Characters and strings are typically surrounded by single and/or double quote characters,
 depending on the language.
 In Clojure, strings are surrounded by double quotes like <code>&quot;Hello!&quot;</code>, while
-characters can be preceded by a backslash like <code>\c</code>.</p>
+characters have a backslash before them like <code>\c</code>.</p>
 <h3 id="truthiness"><a class="header" href="#truthiness">Truthiness</a></h3>
 <p>The technical term for a value that can be either true or false is a <strong>boolean</strong>.
 These can often be thought of as the answers to yes-or-no questions.</p>
 <p>Did I walk the dog this morning? Yes (true).</p>
-<h2 id="sequences"><a class="header" href="#sequences">Sequences</a></h2>
-<p>There are a number of ways of storing a series of multiple scalar values.
-Two ways available to us in Clojure are <strong>lists</strong> and <strong>vectors</strong>.</p>
+<h2 id="collections"><a class="header" href="#collections">Collections</a></h2>
+<p>Let's say you want to create a grocery list.
+Each item you need to buy on the list is a string.
+We need a way storing a series of strings in order to represent the grocery list.</p>
+<p>There are a number of ways of storing a series of multiple values.
+Two ways available to us in Clojure are <strong>lists</strong> and <strong>vectors</strong>,
+which are both types of <em>collections</em>.</p>
 <p>Side note: Clojure descends from a language called Lisp,
 whose name comes from shortening &quot;<strong>lis</strong>t <strong>p</strong>rocesser&quot;.</p>
-<p>We'll start with vectors, which are a series of values surrounded
-by square brackets:</p>
-<pre><code>[&quot;hi&quot; &quot;hello&quot; &quot;yes&quot; &quot;indeed&quot; &quot;hm&quot; &quot;quite&quot;]
-</code></pre>
-<p>Vectors and lists are numerically indexed, starting at 0.
-In the vector above:</p>
-<ul>
-<li>index 0 is &quot;hi&quot;</li>
-<li>index 1 is &quot;hello&quot;</li>
-<li>and so on</li>
-</ul>
-<p><strong>TODO</strong>: explain indexing and add diagram</p>
-<p>To write a list literal*, you surround a series of values with parentheses,
-with a single quote at the beginning:</p>
-<pre><code>'(1 2 3 4 5)
-</code></pre>
-<p>* <em>literal</em> means the way of writing a constant value</p>
-<p>We'll get to why that single quote is necessary when we cover syntax more in depth.</p>
-<p>The basic difference between lists and vectors is:</p>
-<ul>
-<li>lists are fast to add items to, but slow to find a specific item</li>
-<li>vectors are slower to add items to than lists, but fast to find specific items</li>
-</ul>
-<p>This book will largely be using vectors in its examples.</p>
-<h2 id="key-value-pairs"><a class="header" href="#key-value-pairs">Key-value pairs</a></h2>
+<p>Lists can we written as a series of values surrounded by parentheses,
+with or without commas, like:</p>
+<p><code>(&quot;apples&quot; &quot;eggs&quot; &quot;bread&quot;)</code></p>
+<p>Lists are fast to add items to, but when you go to find an item,
+you can only grab the <em>first</em> item,
+followed by another list containers the <em>rest</em> of the items,
+which makes them slower to go through.
+We'll go over why this is later on.</p>
+<p>Vectors are written as a series of values surrounded by square brackets:</p>
+<p><code>[&quot;apples&quot; &quot;eggs&quot; &quot;bread&quot;]</code></p>
+<p>Each element in a vector has a numeric ID, called an index.
+Indexes start at 0 and increment, so the first element is index 0,
+the second is index 1, and so on.
+If you know the index of an element, you can retrieve it instantly.
+It is slower to add items to compared to a list, however.</p>
+<h3 id="pairs-of-keys-and-values"><a class="header" href="#pairs-of-keys-and-values">Pairs of Keys and Values</a></h3>
 <p>A structure known as a <strong>hash map</strong> or simply <strong>map</strong> is the
 bread and butter of passing data around in Clojure.
-Think about IDs like on passports and drivers license.
+It is another type of collection.
+Think about ID numbers like on passports and drivers licenses.
 With one value, a government system can look up data on a person.</p>
-<p>Maps have <em>keys</em> which are values that serve as identifiers,
-and a matching <em>value</em>, which could be any type of data,
+<p>Maps have <em>keys</em> which are pieces of data that serve as identifiers,
+and matching <em>values</em>, which could be any type of data,
 incuding other maps!</p>
-<p>A map is defined as series of keys followed immediatedly
-by their value within curly brackets.
+<p>A map is written as a series pairs of a key followed by its value.
 There is no separator between a key and its value besides a space,
 and while you can optionally separate pairs by commas,
 conventionally we put each pair on its own line.</p>
@@ -218,7 +210,10 @@ conventionally we put each pair on its own line.</p>
 <pre><code>{&quot;key1&quot; &quot;value1&quot;
  &quot;key2&quot; &quot;value2&quot;}
 </code></pre>
-<p>A lookup table* of month number and their short month names:</p>
+<p>Maps are often used for creating <em>lookup tables</em>.
+A lookup table is a convenient way to translate some type of ID
+to its value.</p>
+<p>Below is a lookup table of month numbers to their shorthand names.</p>
 <pre><code>{ 1 &quot;Jan&quot;
   2 &quot;Feb&quot;
   3 &quot;Mar&quot;
@@ -232,13 +227,15 @@ conventionally we put each pair on its own line.</p>
  11 &quot;Nov&quot;
  12 &quot;Dec&quot;}
 </code></pre>
-<p>* <em>lookup tables</em> are convenient ways of converting one value to another</p>
-<p>In Clojure, lists, vectors and maps all fall under
-the category of <strong>collection</strong>.</p>
-<h2 id="sets"><a class="header" href="#sets">Sets</a></h2>
-<p>A <code>set</code> contains only unique values.
-It's a bit like solely the keys of a hash map.</p>
-<pre><code>#{&quot;foo&quot; &quot;bar&quot; &quot;baz&quot;}
+<h3 id="sets"><a class="header" href="#sets">Sets</a></h3>
+<p>A set is another sort of collection, which is a sequence containing
+only unique values.</p>
+<p>Let's say you're hosting a party, and are making a guest list.
+If someone repeatedly told you that they're coming,
+you wouldn't add their name to the guest list multiple times.
+In this case, you can use a set of guest names to make sure
+that there's no duplicate entries.</p>
+<pre><code>#{&quot;Greg&quot; &quot;Charlie&quot; &quot;Taylor&quot;}
 </code></pre>
 
                     </main>
