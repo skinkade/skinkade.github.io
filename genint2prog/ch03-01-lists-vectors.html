@@ -151,37 +151,63 @@
     window.klipse_settings = {
         selector: '.language-klipse'
     };
+
+    // prevent book.js from breaking left/right arrows
+    document.addEventListener(
+      'keydown',
+      function (e) {
+        if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) { return; }
+        if (window.search && window.search.hasFocus()) { return; }
+
+        switch (e.key) {
+          case 'ArrowRight':
+            e.stopImmediatePropagation();
+            break;
+          case 'ArrowLeft':
+            e.stopImmediatePropagation();
+            break;
+        }
+      },
+      false);
 </script>
 <h2 id="finding-elements"><a class="header" href="#finding-elements">Finding Elements</a></h2>
 <p>Clojure has convenience functions such as <code>first</code> and <code>second</code>
 to retrieve items from a collection:</p>
-<pre><code class="language-klipse">(second [1 2 3])
+<pre><code class="language-klipse">(first [1 2 3])
 </code></pre>
 <p>More generally however, specific items can be retrieved using
-the <code>nth</code> function (as in: 1st, 2nd, 3rd ... <em>nth</em>).
-It has the form:</p>
+the <code>nth</code> function.</p>
+<p>If you have a series of numbers <code>0, 1, 2, 3, ... n</code>, where <code>n</code>
+represents any specific number, then <code>0th, 1st, 2nd, 3rd, ... nth</code>
+is how you refer to that element.</p>
+<p><code>nth</code> has the form:</p>
 <pre><code>(nth collection index)
 </code></pre>
 <p>Remember that indexes start at 0, not 1, so if we want to grab
-the 3rd element, we need to retrieve index 2:</p>
-<pre><code class="language-klipse">(nth [1 2 3] 2)
+the first element, we call <code>nth</code> using index 0.
+Below is (almost) equivalent to calling <code>first</code>:</p>
+<pre><code class="language-klipse">(nth [1 2 3] 0)
 </code></pre>
-<p><code>nth</code> will throw an error if you try to retrieve an index that doesn't exist:</p>
+<p>Almost equivalent, because <code>nth</code> will throw an error if you try to retrieve
+an index that doesn't exist:</p>
 <pre><code class="language-klipse">(nth [1 2 3] 10)
 </code></pre>
 <p>There's also the <code>get</code> function, which in this instance functions
-similarly to <code>nth</code>, but does not throw an error, instead returning <code>nil</code>.</p>
+similarly to <code>nth</code>, but does not throw an error on a non-existing index,
+instead returning <code>nil</code>.
+<code>first</code> will also return <code>nil</code> for an empty sequence.</p>
 <pre><code class="language-klipse">(get [1 2 3] 10)
 </code></pre>
 <p>Now is a good time to introduce the concept of <em>null values</em>,
 called <em>nils</em> in Clojure. As opposed to the number 0 representing
 zero of <em>something</em>, a <em>null</em> is the complete absence of a value.</p>
 <h2 id="adding-elements"><a class="header" href="#adding-elements">Adding Elements</a></h2>
-<p>To add an element to a list or vectors, we <strong>conj</strong>oin the
+<p>To add an element to a list or vector, we <strong>conj</strong>oin the
 element to the collection with the <code>conj</code> function.
 An interesting note: when we add an element to a vector,
 it's added to the end.
-When we add an element to a list, it's added to the beginning.</p>
+When we add an element to a list, it's added to the beginning.
+Why that is will be explained later.</p>
 <pre><code class="language-klipse">(conj [1 2 3] 4)
 </code></pre>
 <pre><code class="language-klipse">(conj '(1 2 3) 4)
@@ -198,14 +224,13 @@ which has the form:</p>
 <pre><code>(range start end)
 </code></pre>
 <p>Let's see what we get...</p>
-<pre><code class="language-klipse">(range 1 10)
-</code></pre>
-<p>Ah, almost! One gotcha here is that the end of the range is <em>exclusive</em>,
-that is, it excludes the number itself.
-This means that the end of our range actually has to be one higher
-than the end number we want:</p>
 <pre><code class="language-klipse">(range 1 11)
 </code></pre>
+<p>Why did I use <code>11</code> as the end?
+One gotcha here is that the end of the range is <em>exclusive</em>,
+that is, it excludes the number itself.
+This means that the end of our range actually has to be one higher
+than the end number we want.</p>
 <p>What if we want a list of 10 fives?
 Clojure has the <code>repeat</code> function for that:</p>
 <pre><code>(repeat count value)
@@ -240,7 +265,7 @@ a function as the argument of another function.</p>
 meaning they can be treated just like pieces of data.
 <em>This includes being passed as arguments to other functions!</em></p>
 <p>Many core functions in Clojure take other functions as their arguments.
-Often, these argument functions are used by calling function to somehow
+Often, these argument functions are used by the calling function to somehow
 manipulate a collection of data.</p>
 <p>Before we discuss one such function, I'd like to get a potential source of
 confusion out of the way. Clojure has data structures called <em>(hash) maps</em>,
@@ -290,6 +315,8 @@ Say for instance that you just want to display each value.</p>
 <p>First you'll need to know the function <code>println</code>, which takes
 one or more pieces of data, and prints a line in a console
 containing the <em>human-readable</em> version of that data.</p>
+<pre><code class="language-klipse">(println &quot;hello!&quot;)
+</code></pre>
 <p>We can combine that with the function <code>doseq</code>, which <strong>do</strong>es something
 to each item in a <strong>seq</strong>uence:</p>
 <pre><code class="language-klipse">(doseq [item [1 2 3 4]]
@@ -299,13 +326,13 @@ to each item in a <strong>seq</strong>uence:</p>
 Something brand new is the first argument, <code>[item [1 2 3 4]]</code>.
 <code>doseq</code> uses this form to <em>bind</em> each value in <code>[1 2 3 4]</code> to
 the variable <code>item</code>.
-Then for each of these items, it evaluates <code>(println items)</code>.</p>
+Then for each of these items, it evaluates <code>(println item)</code>.</p>
 <p>You'll also notice that the editor printed <code>nil</code> at the end.
 In Clojure, every evaluation has to return <em>something</em>,
 and if it doesn't return something, it will default to returning <code>nil</code>.</p>
 <h2 id="a-challenge"><a class="header" href="#a-challenge">A Challenge</a></h2>
 <p>If you're ready, the following is a challenge that combines everything
-we've learned so far, and introduce several more things.</p>
+we've learned so far, and introduces several more things.</p>
 <p>Let's say we want display the following:</p>
 <pre><code>*
 **
@@ -314,7 +341,10 @@ we've learned so far, and introduce several more things.</p>
 *****
 </code></pre>
 <p>What may seem simple is actually a bit tricky.
-What is it that we need to do here?</p>
+I'm going to demonstrate one solution,
+and ask you to complete another.</p>
+<h3 id="first-solution-with-lazy-sequences"><a class="header" href="#first-solution-with-lazy-sequences">First Solution, with lazy sequences</a></h3>
+<p>What is it that we need to do here?</p>
 <p>Here's what we'll do:</p>
 <ul>
 <li>write a function that adds a '*' character to a string,
@@ -360,11 +390,54 @@ We just need to print each item as a line with <code>doseq</code> and <code>prin
   [s]
   (str s &quot;*&quot;))
 
-(def stars
+(def star-sequence
   (iterate add-star &quot;*&quot;))
 
 (def five-stars
-  (take 5 stars))
+  (take 5 star-sequence))
+
+(doseq [star-line five-stars]
+  (println star-line))
+</code></pre>
+<h3 id="second-solution-with-map--range"><a class="header" href="#second-solution-with-map--range">Second Solution, with map + range</a></h3>
+<p>This solution uses slightly a different process than the first:</p>
+<ul>
+<li>write a function that generates a string containing a number of stars</li>
+<li>map over a range of numbers, calling the above function on each number</li>
+<li>print each element</li>
+</ul>
+<p>One thing to note before we begin.
+In the previous exercise, I introduce <code>str</code> to create a single string out
+of a numbers of arguments.
+However, this only works on the list of arguments, not an argument
+which happens to be a list.
+Meaning, this does not do what we might expect:</p>
+<pre><code class="language-klipse">(str [&quot;abc&quot; &quot;def&quot;])
+</code></pre>
+<p>Allow me to introduce <code>apply</code>, a function which takes an input function
+and a collection, and treats that collection like individual
+arguments to the input function:</p>
+<pre><code>(apply function collection)
+</code></pre>
+<pre><code class="language-klipse">(apply str [&quot;abc&quot; &quot;def&quot;])
+</code></pre>
+<p>We can now move on to writing a function which,
+for a given number <em>x</em>, returns a string containing <em>x</em> number of stars.</p>
+<p>To do this, we can use the <code>repeat</code> function to get a list of <em>x</em> number
+of stars as individual strings, then <code>apply str</code> to make them into one string.</p>
+<pre><code class="language-klipse">(println &quot;Individual stars: &quot; (repeat 5 &quot;*&quot;))
+
+(apply str (repeat 5 &quot;*&quot;))
+</code></pre>
+<p>We then want to generate a list of numbers with <code>range</code>,
+and use <code>map</code> to pass each of those numbers to the function we define.
+Then, we print each element of the result with <code>doseq</code> and <code>println</code>.</p>
+<pre><code class="language-klipse">(defn make-star-string
+  [length]
+  (apply str (repeat length &quot;*&quot;)))
+
+(def five-stars
+  (map make-star-string (range 1 6)))
 
 (doseq [star-line five-stars]
   (println star-line))

@@ -142,7 +142,62 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="data-types"><a class="header" href="#data-types">Data Types</a></h1>
+                        <h1 id="data"><a class="header" href="#data">Data</a></h1>
+<p>Clojure allows us to easily combine simple values
+and simple data structures to create gradually more complex data.
+I'll show an example of this, but don't worry if you don't understand
+right away, because afterwards we'll go into more depth about
+what each piece of data is and what it respresents.</p>
+<p>Let's say you want to write a grocery list.
+First, you need some way of representing text.
+In Clojure, and most programming languages,
+we surround a piece of text with double quotes:</p>
+<pre><code class="language-clojure">&quot;apples&quot;
+</code></pre>
+<p>Ah, but a grocery list has multiple items, of course.
+We need a way of keeping multiple values together.
+One way to do this in Clojure is by surrounding
+multiple items with square brackets, like so:</p>
+<pre><code class="language-clojure">[&quot;apples&quot;, &quot;bananas&quot;, &quot;milk&quot;, &quot;eggs&quot;, &quot;bread&quot;]
+</code></pre>
+<p>Now we need a way of saying <em>how many</em> of a thing we need.
+This can be any old number like <code>6</code> or <code>42</code>.</p>
+<p>Now to get a bit fancy.
+When you shop in a supermarket, you generally shop one
+area at a time, and grab the items in that area all at once,
+instead of going back and forth through the store.
+So, we want to group our grocery list into categories,
+so our shopping can be more efficient:</p>
+<pre><code class="language-clojure">{&quot;produce&quot; [&quot;apples&quot;, &quot;bananas&quot;],
+ &quot;dairy&quot;   [&quot;milk&quot;, &quot;eggs&quot;],
+ &quot;bakery&quot;  [&quot;bread&quot;]}
+</code></pre>
+<p>Let's break that down a bit.
+In each line, the first item is an area of the store,
+and the second is a series of goods in that area we want to buy.</p>
+<p>Let's go one step further, just for fun before we get into the boring bits.</p>
+<p>For each item we're buying, we want to have alongside it the
+number we're buying of it.</p>
+<p>Just as we made a series of pairs above,
+we could say that an item on our grocery list is also a
+series of pairs:</p>
+<pre><code class="language-clojure">{&quot;item&quot;   &quot;apple&quot;,
+ &quot;number&quot; 10}
+</code></pre>
+<p>And if we combine that with our store area categorization,
+we get something like:</p>
+<pre><code class="language-clojure">{&quot;produce&quot; [{&quot;item&quot;   &quot;apple&quot;,
+             &quot;number&quot; 10},
+            {&quot;item&quot;   &quot;banana&quot;,
+             &quot;number&quot; 6}],
+ &quot;dairy&quot;   [{&quot;item&quot;   &quot;milk&quot;,
+             &quot;number&quot; 1},
+            {&quot;item&quot;   &quot;eggs&quot;,
+             &quot;number&quot; 12}],
+ &quot;bakery&quot;  [{&quot;item&quot;   &quot;bread&quot;,
+             &quot;number&quot; 1}]}
+</code></pre>
+<h2 id="data-types"><a class="header" href="#data-types">Data Types</a></h2>
 <p>Data can take the form of either single, individual values, or
 structures which can contain more than one value.
 Data can also be broken down into categories,
@@ -151,7 +206,7 @@ These types are related to how a piece of data is stored
 in the computer's memory.
 This section explains some of Clojure's core data types.</p>
 <h3 id="numbers"><a class="header" href="#numbers">Numbers</a></h3>
-<p>In computering, there is a distinction between whole numbers
+<p>In computing, there is a distinction between whole numbers
 and numbers with trailing decimal places.
 For now, know that whole numbers without a decimal point are called <strong>integers</strong>,
 such as <code>1</code>, <code>100</code>, or <code>9841098</code>; and numbers with decimal points are called <strong>floats</strong>,
@@ -170,9 +225,6 @@ characters have a backslash before them like <code>\c</code>.</p>
 These can often be thought of as the answers to yes-or-no questions.</p>
 <p>Did I walk the dog this morning? Yes (true).</p>
 <h2 id="collections"><a class="header" href="#collections">Collections</a></h2>
-<p>Let's say you want to create a grocery list.
-Each item you need to buy on the list is a string.
-We need a way storing a series of strings in order to represent the grocery list.</p>
 <p>There are a number of ways of storing a series of multiple values.
 Two ways available to us in Clojure are <strong>lists</strong> and <strong>vectors</strong>,
 which are both types of <em>collections</em>.</p>
@@ -180,14 +232,18 @@ which are both types of <em>collections</em>.</p>
 whose name comes from shortening &quot;<strong>lis</strong>t <strong>p</strong>rocesser&quot;.</p>
 <p>Lists can we written as a series of values surrounded by parentheses,
 with or without commas, like:</p>
-<p><code>(&quot;apples&quot; &quot;eggs&quot; &quot;bread&quot;)</code></p>
+<pre><code class="language-clojure">(&quot;apples&quot; &quot;eggs&quot; &quot;bread&quot;)
+</code></pre>
 <p>Lists are fast to add items to, but when you go to find an item,
 you can only grab the <em>first</em> item,
 followed by another list containers the <em>rest</em> of the items,
 which makes them slower to go through.
-We'll go over why this is later on.</p>
+If you want to reach the last item in a list 1,000 elements long,
+you have to go through each of the 999 elements before it.</p>
+<p>We'll go over why this is later on.</p>
 <p>Vectors are written as a series of values surrounded by square brackets:</p>
-<p><code>[&quot;apples&quot; &quot;eggs&quot; &quot;bread&quot;]</code></p>
+<pre><code class="language-clojure">[&quot;apples&quot; &quot;eggs&quot; &quot;bread&quot;]
+</code></pre>
 <p>Each element in a vector has a numeric ID, called an index.
 Indexes start at 0 and increment, so the first element is index 0,
 the second is index 1, and so on.

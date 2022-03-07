@@ -151,6 +151,24 @@
     window.klipse_settings = {
         selector: '.language-klipse'
     };
+
+    // prevent book.js from breaking left/right arrows
+    document.addEventListener(
+      'keydown',
+      function (e) {
+        if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) { return; }
+        if (window.search && window.search.hasFocus()) { return; }
+
+        switch (e.key) {
+          case 'ArrowRight':
+            e.stopImmediatePropagation();
+            break;
+          case 'ArrowLeft':
+            e.stopImmediatePropagation();
+            break;
+        }
+      },
+      false);
 </script>
 <p>We can check if two values are equal using the <code>=</code> operator.
 These practice problems gradually get more difficult.</p>
