@@ -81,7 +81,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="title-page.html">A Gentle Introduction to Interactive Programming</a></li><li class="chapter-item expanded "><a href="ch01-00-introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="ch02-00-let-the-code-begin.html" class="active"><strong aria-hidden="true">2.</strong> Let the Code Begin</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch02-01-functions.html"><strong aria-hidden="true">2.1.</strong> Functions</a></li><li class="chapter-item expanded "><a href="ch02-02-practice.html"><strong aria-hidden="true">2.2.</strong> Practice</a></li></ol></li><li class="chapter-item expanded "><a href="ch03-00-all-about-data.html"><strong aria-hidden="true">3.</strong> All About Data</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="title-page.html">A Gentle Introduction to Interactive Programming</a></li><li class="chapter-item expanded "><a href="ch01-00-introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="ch02-00-let-the-code-begin.html" class="active"><strong aria-hidden="true">2.</strong> Let the Code Begin</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch02-01-functions.html"><strong aria-hidden="true">2.1.</strong> Functions</a></li><li class="chapter-item expanded "><a href="ch02-02-practice.html"><strong aria-hidden="true">2.2.</strong> Practice</a></li></ol></li><li class="chapter-item expanded "><a href="ch03-00-all-about-data.html"><strong aria-hidden="true">3.</strong> All About Data</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch03-01-variables.html"><strong aria-hidden="true">3.1.</strong> Variables</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -174,7 +174,7 @@
 We'll start with the absolute basics: adding two numbers together.</p>
 <pre><code class="language-klipse">(+ 2 2)
 </code></pre>
-<p>Already a lot going on, eh?</p>
+<p>Already a lot going on, but don't worry.</p>
 <p>Firstly, we're already living up to the title of this book.
 In the block above, you'll see two panes:
 the top is editable code, and the bottom is the result.
@@ -183,7 +183,11 @@ the top is editable code, and the bottom is the result.
 <p>Second, that look awfully weird, doesn't it?
 Why the parentheses, <em>and why does the plus sign come before the numbers?</em></p>
 <p>This is a particular feature of the family of languages that Clojure comes from.
-Clojure is composed of <em>expressions</em>. When an expression is a list of items
+Clojure is composed of <em>expressions</em>.
+<em>Expressions</em> can either be an individual value like the number <code>42</code>
+or the word <code>&quot;apples&quot;</code>, or it could be a list of items, in which
+case those items are surrounded by parentheses.
+When an expression is a list of items
 surrounded by parentheses, the first item is treated as an <em>operator</em> to be
 applied to whatever follows.</p>
 <p>In this case, the plus sign is an addition operator.

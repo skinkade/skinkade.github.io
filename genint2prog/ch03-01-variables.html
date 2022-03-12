@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Introduction - A Gentle Introduction to Interactive Programming</title>
+        <title>Variables - A Gentle Introduction to Interactive Programming</title>
 
 
         <!-- Custom HTML head -->
@@ -81,7 +81,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="title-page.html">A Gentle Introduction to Interactive Programming</a></li><li class="chapter-item expanded "><a href="ch01-00-introduction.html" class="active"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="ch02-00-let-the-code-begin.html"><strong aria-hidden="true">2.</strong> Let the Code Begin</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch02-01-functions.html"><strong aria-hidden="true">2.1.</strong> Functions</a></li><li class="chapter-item expanded "><a href="ch02-02-practice.html"><strong aria-hidden="true">2.2.</strong> Practice</a></li></ol></li><li class="chapter-item expanded "><a href="ch03-00-all-about-data.html"><strong aria-hidden="true">3.</strong> All About Data</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch03-01-variables.html"><strong aria-hidden="true">3.1.</strong> Variables</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="title-page.html">A Gentle Introduction to Interactive Programming</a></li><li class="chapter-item expanded "><a href="ch01-00-introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="ch02-00-let-the-code-begin.html"><strong aria-hidden="true">2.</strong> Let the Code Begin</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch02-01-functions.html"><strong aria-hidden="true">2.1.</strong> Functions</a></li><li class="chapter-item expanded "><a href="ch02-02-practice.html"><strong aria-hidden="true">2.2.</strong> Practice</a></li></ol></li><li class="chapter-item expanded "><a href="ch03-00-all-about-data.html"><strong aria-hidden="true">3.</strong> All About Data</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch03-01-variables.html" class="active"><strong aria-hidden="true">3.1.</strong> Variables</a></li></ol></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -142,62 +142,83 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="1-introduction"><a class="header" href="#1-introduction">1. Introduction</a></h1>
-<p>Hello, hello! Let's say you want to learn programming.
-Whether that's because you want to bring an idea to life,
-or find computing fascinating, or just think it'll be fun,
-everyone has their own reason for learning how to code.
-I'd like show you how to learn programming in a way that's both
-practical and enjoyable.</p>
-<p>First off, what actually is programming?
-Put simply, it's a way of telling a computer what you want it to do.
-Generally in a very explicit, clear-cut way.</p>
-<p>Computers are really good at taking some input, running some
-manipulations or calculations on it, and giving back some output.
-Both the input and the output are <em>data</em>.</p>
-<p>What might our data be for input?:</p>
-<ul>
-<li>A text document</li>
-<li>A digital photo</li>
-<li>An MP3</li>
-<li>A spreadsheet of numbers</li>
-</ul>
-<p>What calculations would we perform on those?:</p>
-<ul>
-<li>Spellchecking on the text</li>
-<li>Applying a filter to the photo</li>
-<li>Boosting the bass of the MP3</li>
-<li>Calculating tax information on the spreadsheet</li>
-</ul>
-<p>We're getting ahead of ourselves, though.
-When you really get down to it, some of the above gets pretty technical.
-Let's start with something simple: letters.</p>
-<p>Why letters? Well...</p>
-<ul>
-<li>Letters form words</li>
-<li>Words form sentences</li>
-<li>Sentences form paragraphs</li>
-<li>Paragraphs form chapters</li>
-<li>Chapters form books</li>
-<li>Books form libraries</li>
-</ul>
-<p>Starting from something very small, you can build pieces together to form something huge.
-In much the same way, all complex pieces of data and all complex operations are
-fundamentally built from much smaller pieces gradually combined together.</p>
-<p>In this book, we'll be using the Clojure programming language, which is extremely good
-at composing lots of little components into relatively-easy-to-understand big systems.</p>
+                        <h1 id="31-variables"><a class="header" href="#31-variables">3.1 Variables</a></h1>
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="https://storage.googleapis.com/app.klipse.tech/css/codemirror.css">
+<script>
+    window.klipse_settings = {
+        selector: '.language-klipse'
+    };
+
+    // prevent book.js from breaking left/right arrows
+    document.addEventListener(
+      'keydown',
+      function (e) {
+        if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) { return; }
+        if (window.search && window.search.hasFocus()) { return; }
+
+        switch (e.key) {
+          case 'ArrowRight':
+            e.stopImmediatePropagation();
+            break;
+          case 'ArrowLeft':
+            e.stopImmediatePropagation();
+            break;
+        }
+      },
+      false);
+</script>
+<p>You saw in the final exercise of chapter two that, in addition to defining
+our own functions, we can define <em>variables</em> as well.</p>
+<p>Variables are pieces of data that we give a name to so we can easily
+reference them from any number of places.</p>
+<p>We <strong>def</strong>ine a variable with the <code>def</code> operator:</p>
+<pre><code class="language-klipse">(def four 4)
+
+four
+</code></pre>
+<p>In addition to using variables in functions,
+we can also use them in the definitions of other variables.
+Take the last grocery list structure we made, for example.
+We could define each of our categories of items as their
+own variables, then include them within
+the overall grocery list variable.</p>
+<pre><code class="language-klipse">(def produce-items [&quot;apples&quot; &quot;bananas&quot;])
+(def dairy-items [&quot;milk&quot; &quot;eggs&quot;])
+(def bakery-items [&quot;bread&quot;])
+
+(def grocery-list
+  {&quot;produce&quot; produce-items,
+   &quot;dairy&quot;   dairy-items,
+   &quot;bakery&quot;  bakery-items})
+
+grocery-list
+</code></pre>
+<p>Going back to the final exercise of chapter two,
+here's another example:</p>
+<pre><code class="language-klipse">(def pi 3.14)
+
+(def radius 2)
+
+(def circumference (* 2 pi radius))
+
+circumference
+</code></pre>
+<p>Again, feel free to modify the code above and play around!</p>
+<script
+  src="https://storage.googleapis.com/app.klipse.tech/plugin/js/klipse_plugin.js">
+</script>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                            <a rel="prev" href="title-page.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="ch03-00-all-about-data.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next" href="ch02-00-let-the-code-begin.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
-                            </a>
 
                         <div style="clear: both"></div>
                     </nav>
@@ -205,13 +226,10 @@ at composing lots of little components into relatively-easy-to-understand big sy
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                    <a rel="prev" href="title-page.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="ch03-00-all-about-data.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next" href="ch02-00-let-the-code-begin.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
-                    </a>
             </nav>
 
         </div>
