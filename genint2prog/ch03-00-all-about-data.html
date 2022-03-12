@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>A Gentle Introduction to Interactive Programming - A Gentle Introduction to Interactive Programming</title>
+        <title>All About Data - A Gentle Introduction to Interactive Programming</title>
 
 
         <!-- Custom HTML head -->
@@ -81,7 +81,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="title-page.html">A Gentle Introduction to Interactive Programming</a></li><li class="chapter-item expanded "><a href="ch01-00-introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="ch02-00-let-the-code-begin.html"><strong aria-hidden="true">2.</strong> Let the Code Begin</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch02-01-functions.html"><strong aria-hidden="true">2.1.</strong> Functions</a></li><li class="chapter-item expanded "><a href="ch02-02-practice.html"><strong aria-hidden="true">2.2.</strong> Practice</a></li></ol></li><li class="chapter-item expanded "><a href="ch03-00-all-about-data.html"><strong aria-hidden="true">3.</strong> All About Data</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="title-page.html">A Gentle Introduction to Interactive Programming</a></li><li class="chapter-item expanded "><a href="ch01-00-introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="ch02-00-let-the-code-begin.html"><strong aria-hidden="true">2.</strong> Let the Code Begin</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch02-01-functions.html"><strong aria-hidden="true">2.1.</strong> Functions</a></li><li class="chapter-item expanded "><a href="ch02-02-practice.html"><strong aria-hidden="true">2.2.</strong> Practice</a></li></ol></li><li class="chapter-item expanded "><a href="ch03-00-all-about-data.html" class="active"><strong aria-hidden="true">3.</strong> All About Data</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -142,25 +142,113 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="a-gentle-introduction-to-interactive-programming"><a class="header" href="#a-gentle-introduction-to-interactive-programming">A Gentle Introduction to Interactive Programming</a></h1>
-<p><strong>WORK IN PROGRESS. All pages subject to change.</strong></p>
-<p>Source for this book available
-<a href="https://github.com/skinkade/genint2prog">here</a>.</p>
-<p><em>A Gentle Introduction to Interactive Programming</em> aims to provide a resource
-for beginners with little to no experience in programming.</p>
-<p>This book will gradually introduce core programming concepts,
-explained in plain English with minimal jargon.
-It uses the Clojure programming language and aims to teach
-the value of <em>read-evaluate-print-loop</em> (REPL) driven development.</p>
+                        <h1 id="3-all-about-data"><a class="header" href="#3-all-about-data">3. All About Data</a></h1>
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="https://storage.googleapis.com/app.klipse.tech/css/codemirror.css">
+<script>
+    window.klipse_settings = {
+        selector: '.language-klipse'
+    };
+
+    // prevent book.js from breaking left/right arrows
+    document.addEventListener(
+      'keydown',
+      function (e) {
+        if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) { return; }
+        if (window.search && window.search.hasFocus()) { return; }
+
+        switch (e.key) {
+          case 'ArrowRight':
+            e.stopImmediatePropagation();
+            break;
+          case 'ArrowLeft':
+            e.stopImmediatePropagation();
+            break;
+        }
+      },
+      false);
+</script>
+<p>Let's say we want to start writing a grocery list.
+How do we do that?: one item at a time.</p>
+<p>We'll say for the moment that an item on our grocery list
+is just the name of that item, to keep it simple.
+In most programming languages, pieces of text are written
+surrounded by double quotes:</p>
+<pre><code class="language-clojure">&quot;apples&quot;
+</code></pre>
+<p>Ah, but a grocery list has multiple items, of course.
+If we were to just write multiple pieces of text...</p>
+<pre><code class="language-clojure">&quot;apples&quot;
+&quot;bananas&quot;
+&quot;milk&quot;
+</code></pre>
+<p>... there's nothing actually tying those things together.</p>
+<p>I suppose we could also write them as a single piece of text...</p>
+<pre><code class="language-clojure">&quot;apples, bananas, milk&quot;
+</code></pre>
+<p>... but that'd quickly get a bit messy when we have 20+ items,
+and especially when we need to sort them or perform some
+other operations.</p>
+<p>They need to be individual pieces within some larger whole -
+a slightly more complex piece of data.
+In Clojure, one way of doing this is to write the individual pieces
+within square brackets, optionally with commas in between, like so:</p>
+<pre><code class="language-clojure">[&quot;apples&quot;, &quot;bananas&quot;, &quot;milk&quot;, &quot;eggs&quot;, &quot;bread&quot;]
+</code></pre>
+<p>Much better! This particular piece of data is one we can easily
+perform useful operations on, such as sorting the items alphabetically:</p>
+<pre><code class="language-klipse">(sort [&quot;apples&quot;, &quot;bananas&quot;, &quot;milk&quot;, &quot;eggs&quot;, &quot;bread&quot;])
+</code></pre>
+<p>We can easily, say, grab the first or last item of the grocery list:</p>
+<pre><code class="language-klipse">(first [&quot;apples&quot;, &quot;bananas&quot;, &quot;milk&quot;, &quot;eggs&quot;, &quot;bread&quot;])
+</code></pre>
+<hr />
+<pre><code class="language-klipse">(last [&quot;apples&quot;, &quot;bananas&quot;, &quot;milk&quot;, &quot;eggs&quot;, &quot;bread&quot;])
+</code></pre>
+<p>Here we've introduced the functions <code>sort</code>, <code>first</code>, and <code>last</code> -
+all handy functions for working with series of data.
+Here's one more: if we want to add a new item to our grocery list,
+we <strong>conj</strong>oin an item to it with the <code>conj</code> function:</p>
+<pre><code class="language-klipse">(conj [&quot;apples&quot;, &quot;bananas&quot;, &quot;milk&quot;, &quot;eggs&quot;, &quot;bread&quot;] &quot;juice&quot;)
+</code></pre>
+<p>Let's go one step further.
+In most American grocery stores, apples and bananas with be in the produce section,
+milk and eggs in the dairy section, and bread in the bakery.</p>
+<p>To say that bread is in the bakery, we might create a mapping of the name
+of an item to the area of the store it's found in.
+We might write that map something like:</p>
+<pre><code class="language-clojure">{&quot;bread&quot; &quot;bakery&quot;}
+</code></pre>
+<p>Within those curly brackets is a pair of two pieces of text.
+What we're saying with this data is that first value
+is associated with the second value.</p>
+<p>For a grocery list, we probably want to flip this the other way around.
+When we shop at the store, we'll go to a section, and pick up everything
+we need in that section at once, so we don't bounce all over the store.</p>
+<p>In that case, for each section of the store, we want that section to be
+associated with a smaller series of relevant items.
+In Clojure, we would write that something like this:</p>
+<pre><code class="language-clojure">{&quot;produce&quot; [&quot;apples&quot;, &quot;bananas&quot;],
+ &quot;dairy&quot;   [&quot;milk&quot;, &quot;eggs&quot;],
+ &quot;bakery&quot;  [&quot;bread&quot;]}
+</code></pre>
+<p>Now you can see that we've combined three different types of data -
+pieces of text, series of items, and association of items -
+into a very useful structure.</p>
+<script
+  src="https://storage.googleapis.com/app.klipse.tech/plugin/js/klipse_plugin.js">
+</script>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-
-                            <a rel="next" href="ch01-00-introduction.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                                <i class="fa fa-angle-right"></i>
+                            <a rel="prev" href="ch02-02-practice.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
                             </a>
+
 
                         <div style="clear: both"></div>
                     </nav>
@@ -168,10 +256,10 @@ the value of <em>read-evaluate-print-loop</em> (REPL) driven development.</p>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-
-                    <a rel="next" href="ch01-00-introduction.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
-                        <i class="fa fa-angle-right"></i>
+                    <a rel="prev" href="ch02-02-practice.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
                     </a>
+
             </nav>
 
         </div>

@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>A Gentle Introduction to Interactive Programming - A Gentle Introduction to Interactive Programming</title>
+        <title>Introduction - A Gentle Introduction to Interactive Programming</title>
 
 
         <!-- Custom HTML head -->
@@ -81,7 +81,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="title-page.html">A Gentle Introduction to Interactive Programming</a></li><li class="chapter-item expanded "><a href="ch01-00-introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="ch02-00-let-the-code-begin.html"><strong aria-hidden="true">2.</strong> Let the Code Begin</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch02-01-functions.html"><strong aria-hidden="true">2.1.</strong> Functions</a></li><li class="chapter-item expanded "><a href="ch02-02-practice.html"><strong aria-hidden="true">2.2.</strong> Practice</a></li></ol></li><li class="chapter-item expanded "><a href="ch03-00-all-about-data.html"><strong aria-hidden="true">3.</strong> All About Data</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="title-page.html">A Gentle Introduction to Interactive Programming</a></li><li class="chapter-item expanded "><a href="ch01-00-introduction.html" class="active"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="ch02-00-let-the-code-begin.html"><strong aria-hidden="true">2.</strong> Let the Code Begin</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch02-01-functions.html"><strong aria-hidden="true">2.1.</strong> Functions</a></li><li class="chapter-item expanded "><a href="ch02-02-practice.html"><strong aria-hidden="true">2.2.</strong> Practice</a></li></ol></li><li class="chapter-item expanded "><a href="ch03-00-all-about-data.html"><strong aria-hidden="true">3.</strong> All About Data</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -142,23 +142,58 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="a-gentle-introduction-to-interactive-programming"><a class="header" href="#a-gentle-introduction-to-interactive-programming">A Gentle Introduction to Interactive Programming</a></h1>
-<p><strong>WORK IN PROGRESS. All pages subject to change.</strong></p>
-<p>Source for this book available
-<a href="https://github.com/skinkade/genint2prog">here</a>.</p>
-<p><em>A Gentle Introduction to Interactive Programming</em> aims to provide a resource
-for beginners with little to no experience in programming.</p>
-<p>This book will gradually introduce core programming concepts,
-explained in plain English with minimal jargon.
-It uses the Clojure programming language and aims to teach
-the value of <em>read-evaluate-print-loop</em> (REPL) driven development.</p>
+                        <h1 id="1-introduction"><a class="header" href="#1-introduction">1. Introduction</a></h1>
+<p>Hello, hello! Let's say you want to learn programming.
+Whether that be because you want to bring an idea to life,
+or find computing fascinating, or just think it'll be fun,
+let's go about this in a practical yet enjoyable manner, eh?</p>
+<p>First off, what actually is programming?
+Put simply, it's a way of telling a computer what you want it to do.
+Generally in a very explicit, clear-cut way.</p>
+<p>Computers are really good at taking some input, running some
+manipulations or calculations on it, and giving back some output.
+Both the input and the output are <em>data</em>.</p>
+<p>What might our data be for input?:</p>
+<ul>
+<li>A text document</li>
+<li>A digital photo</li>
+<li>An MP3</li>
+<li>A spreadsheet of numbers</li>
+</ul>
+<p>What calculations would we perform on those?:</p>
+<ul>
+<li>Spellchecking on the text</li>
+<li>Applying a filter to the photo</li>
+<li>Boosting the bass of the MP3</li>
+<li>Calculating tax information on the spreadsheet</li>
+</ul>
+<p>We're getting ahead of ourselves, though.
+When you really get down to it, some of the above gets pretty technical.
+Let's start with something simple: letters.</p>
+<p>Why letters? Well...</p>
+<ul>
+<li>Letters form words</li>
+<li>Words form sentences</li>
+<li>Sentences form paragraphs</li>
+<li>Paragraphs form chapters</li>
+<li>Chapters form books</li>
+<li>Books form libraries</li>
+</ul>
+<p>Starting from something very small, you can build pieces together to form something huge.
+In much the same way, all complex pieces of data and all complex operations are
+fundamentally built from much smaller pieces gradually combined together.</p>
+<p>In this book, we'll be using the Clojure programming language, which is extremely good
+at composing lots of little components into relatively-easy-to-understand big systems.</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="title-page.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
 
-                            <a rel="next" href="ch01-00-introduction.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="ch02-00-let-the-code-begin.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -168,8 +203,11 @@ the value of <em>read-evaluate-print-loop</em> (REPL) driven development.</p>
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="title-page.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
 
-                    <a rel="next" href="ch01-00-introduction.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="ch02-00-let-the-code-begin.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
