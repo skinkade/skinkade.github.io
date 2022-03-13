@@ -149,7 +149,8 @@
   href="https://storage.googleapis.com/app.klipse.tech/css/codemirror.css">
 <script>
     window.klipse_settings = {
-        selector: '.language-klipse'
+        selector: '.language-klipse',
+        eval_idle_msec: 200
     };
 
     // prevent book.js from breaking left/right arrows
@@ -177,26 +178,29 @@ We'll start with the absolute basics: adding two numbers together.</p>
 <p>Already a lot going on, but don't worry.</p>
 <p>Firstly, we're already living up to the title of this book.
 In the block above, you'll see two panes:
-the top is editable code, and the bottom is the result.
-<em>Interactive programming, woo!</em></p>
-<p>(That's nothing compared to what we'll be getting up to later, though.)</p>
+the top is editable code, and the bottom is the result. Here,
+we can interactively write some code, and the result will appear to us instantly!</p>
+<p>(That's nothing compared to what we'll be getting up to later, though 😉)</p>
 <p>Second, that look awfully weird, doesn't it?
 Why the parentheses, <em>and why does the plus sign come before the numbers?</em></p>
-<p>This is a particular feature of the family of languages that Clojure comes from.
-Clojure is composed of <em>expressions</em>.
-<em>Expressions</em> can either be an individual value like the number <code>42</code>
-or the word <code>&quot;apples&quot;</code>, or it could be a list of items, in which
-case those items are surrounded by parentheses.
-When an expression is a list of items
-surrounded by parentheses, the first item is treated as an <em>operator</em> to be
-applied to whatever follows.</p>
-<p>In this case, the plus sign is an addition operator.
-The numbers that follow are what get fed into that addition.</p>
-<p>You can write any number of numbers to be fed into this addition operator.
-Unlike with typical math, you don't need to write a '+' between each number.</p>
+<p>This is a peculiar feature of Clojure that might look a little odd at first glance!
+Here's what's going on - Clojure is composed of what we call <em>expressions</em>.
+<em>Expressions</em> are just anything that can be <em>evaluated</em> and in turn produce <em>values</em>. 
+An expression can be as simple as the number <code>42</code> or the word <code>&quot;apples&quot;</code>, 
+but they can also get more complicated, like a list of items. 
+When an expression is a list of items, we group those items together inside 
+parentheses - like in our list above <code>(+ 2 2)</code>. When our expression is a list of 
+items like this, we call the first element the <em>function</em> and everything after 
+it the <em>arguments</em>.</p>
+<p>In this case, the plus sign is an addition function.
+The numbers that follow are the arguments, so we're adding those numbers.
+Instead of &quot;two plus two&quot;, think &quot;add two and two&quot;.</p>
+<p>You can write any number of numbers to be fed into this addition function.
+Unlike with typical math, you don't need to write a '+' between each number. 
+This is really handy when trying to add just a bunch of numbers:</p>
 <pre><code class="language-klipse">(+ 1 2 3 4 5 6 7 8 9)
 </code></pre>
-<p>Subtraction, multiplication, and division work the same way.
+<p>And subtraction, multiplication and division work the same way!
 In the following code blocks, try changing the numbers, and/or
 adding some more numbers.</p>
 <pre><code class="language-klipse">(- 10 3)

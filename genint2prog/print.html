@@ -155,15 +155,15 @@ integrated development environment (IDE) in the form of Visual Studio Code
 will provide learners a tight feedback loop for learning code.
 This online book also features embedded interactive code snippets.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="1-introduction"><a class="header" href="#1-introduction">1. Introduction</a></h1>
-<p>Hello, hello! Let's say you want to learn programming.
+<p>Hello, hello! So, you want to learn programming.
 Whether that's because you want to bring an idea to life,
 or find computing fascinating, or just think it'll be fun,
 everyone has their own reason for learning how to code.
 I'd like show you how to learn programming in a way that's both
 practical and enjoyable.</p>
 <p>First off, what actually is programming?
-Put simply, it's a way of telling a computer what you want it to do.
-Generally in a very explicit, clear-cut way.</p>
+Put simply, it's a way of telling a computer what you want it to do - 
+generally in a very explicit, clear-cut way.</p>
 <p>Computers are really good at taking some input, running some
 manipulations or calculations on it, and giving back some output.
 Both the input and the output are <em>data</em>.</p>
@@ -182,22 +182,25 @@ Both the input and the output are <em>data</em>.</p>
 <li>Calculating tax information on the spreadsheet</li>
 </ul>
 <p>We're getting ahead of ourselves, though.
-When you really get down to it, some of the above gets pretty technical.
-Let's start with something simple: letters.</p>
-<p>Why letters? Well...</p>
-<ul>
-<li>Letters form words</li>
-<li>Words form sentences</li>
-<li>Sentences form paragraphs</li>
-<li>Paragraphs form chapters</li>
-<li>Chapters form books</li>
-<li>Books form libraries</li>
-</ul>
-<p>Starting from something very small, you can build pieces together to form something huge.
-In much the same way, all complex pieces of data and all complex operations are
-fundamentally built from much smaller pieces gradually combined together.</p>
-<p>In this book, we'll be using the Clojure programming language, which is extremely good
-at composing lots of little components into relatively-easy-to-understand big systems.</p>
+When you really get down to it, some of the above gets pretty technical.</p>
+<p>Let's start with some very basic math.
+Note: you do <strong>not</strong> need to know advanced math to be a programmer!</p>
+<p>Imagine a simple math problem like <code>2 + 2</code> or <code>3 * 4</code>.
+Very simple on its own, but if you think about it, you can keep combining
+more and more simple problems to form a more difficult one. Say...</p>
+<p><code>2 + 8 * 3 / 6 * (10 - 7)</code></p>
+<p>Suddenly you've got a more complex problem,
+but so long as you follow some rules (PEMDAS / BODMAS),
+you can break it back down into smaller parts to make it easier to solve:</p>
+<pre><code>2 + 8 * 3 / 6 * (10 - 7)
+2 + 8 * 3 / 6 * 3
+2 + 24 / 6 * 3
+2 + 4 * 3
+2 + 12
+14
+</code></pre>
+<p>Computing works in the same way: every complex procedure is just a series of
+smaller procedures, that can even be broken down and re-combined in different ways.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="2-let-the-code-begin"><a class="header" href="#2-let-the-code-begin">2. Let the Code Begin</a></h1>
 <link
   rel="stylesheet"
@@ -205,7 +208,8 @@ at composing lots of little components into relatively-easy-to-understand big sy
   href="https://storage.googleapis.com/app.klipse.tech/css/codemirror.css">
 <script>
     window.klipse_settings = {
-        selector: '.language-klipse'
+        selector: '.language-klipse',
+        eval_idle_msec: 200
     };
 
     // prevent book.js from breaking left/right arrows
@@ -233,26 +237,29 @@ We'll start with the absolute basics: adding two numbers together.</p>
 <p>Already a lot going on, but don't worry.</p>
 <p>Firstly, we're already living up to the title of this book.
 In the block above, you'll see two panes:
-the top is editable code, and the bottom is the result.
-<em>Interactive programming, woo!</em></p>
-<p>(That's nothing compared to what we'll be getting up to later, though.)</p>
+the top is editable code, and the bottom is the result. Here,
+we can interactively write some code, and the result will appear to us instantly!</p>
+<p>(That's nothing compared to what we'll be getting up to later, though 😉)</p>
 <p>Second, that look awfully weird, doesn't it?
 Why the parentheses, <em>and why does the plus sign come before the numbers?</em></p>
-<p>This is a particular feature of the family of languages that Clojure comes from.
-Clojure is composed of <em>expressions</em>.
-<em>Expressions</em> can either be an individual value like the number <code>42</code>
-or the word <code>&quot;apples&quot;</code>, or it could be a list of items, in which
-case those items are surrounded by parentheses.
-When an expression is a list of items
-surrounded by parentheses, the first item is treated as an <em>operator</em> to be
-applied to whatever follows.</p>
-<p>In this case, the plus sign is an addition operator.
-The numbers that follow are what get fed into that addition.</p>
-<p>You can write any number of numbers to be fed into this addition operator.
-Unlike with typical math, you don't need to write a '+' between each number.</p>
+<p>This is a peculiar feature of Clojure that might look a little odd at first glance!
+Here's what's going on - Clojure is composed of what we call <em>expressions</em>.
+<em>Expressions</em> are just anything that can be <em>evaluated</em> and in turn produce <em>values</em>. 
+An expression can be as simple as the number <code>42</code> or the word <code>&quot;apples&quot;</code>, 
+but they can also get more complicated, like a list of items. 
+When an expression is a list of items, we group those items together inside 
+parentheses - like in our list above <code>(+ 2 2)</code>. When our expression is a list of 
+items like this, we call the first element the <em>function</em> and everything after 
+it the <em>arguments</em>.</p>
+<p>In this case, the plus sign is an addition function.
+The numbers that follow are the arguments, so we're adding those numbers.
+Instead of &quot;two plus two&quot;, think &quot;add two and two&quot;.</p>
+<p>You can write any number of numbers to be fed into this addition function.
+Unlike with typical math, you don't need to write a '+' between each number. 
+This is really handy when trying to add just a bunch of numbers:</p>
 <pre><code class="language-klipse">(+ 1 2 3 4 5 6 7 8 9)
 </code></pre>
-<p>Subtraction, multiplication, and division work the same way.
+<p>And subtraction, multiplication and division work the same way!
 In the following code blocks, try changing the numbers, and/or
 adding some more numbers.</p>
 <pre><code class="language-klipse">(- 10 3)
@@ -288,7 +295,8 @@ For instance:</p>
   href="https://storage.googleapis.com/app.klipse.tech/css/codemirror.css">
 <script>
     window.klipse_settings = {
-        selector: '.language-klipse'
+        selector: '.language-klipse',
+        eval_idle_msec: 200
     };
 
     // prevent book.js from breaking left/right arrows
@@ -309,19 +317,17 @@ For instance:</p>
       },
       false);
 </script>
-<p>We've seen operators for addition, subtraction, multiplication, and division.
-We're far from limited to those, though.
-Clojure has hundreds of operators built-in.
-Let's talk about how a lot of those operators are defined.</p>
-<p>For the moment, we're going to say that a <strong>function</strong> is an operation
-which takes some input data and returns some output data.</p>
-<p>To <strong>de</strong>fine a <strong>f</strong>u<strong>n</strong>ction, we use the <code>defn</code> operator.
+<p>We've seen functions for addition, subtraction, multiplication, and division.
+We're far from limited to those, though!
+Not only does Clojure have hundreds of functions built-in,
+we can define our own functions to use!</p>
+<p>To <strong>de</strong>fine a <strong>f</strong>u<strong>n</strong>ction, we use <code>defn</code>.
 The form for this looks like:</p>
 <pre><code class="language-clojure">(defn function-name
     [input]
     (do-something-with input))
 </code></pre>
-<p>Remember that this is a list, where the first item is the operator <code>defn</code>.
+<p>Remember that this is a list, where the first item is <code>defn</code>.
 In this case:</p>
 <ul>
 <li>the second item is the name we want to give to the function we're defining</li>
@@ -359,7 +365,8 @@ that multiplies a value by five:</p>
   href="https://storage.googleapis.com/app.klipse.tech/css/codemirror.css">
 <script>
     window.klipse_settings = {
-        selector: '.language-klipse'
+        selector: '.language-klipse',
+        eval_idle_msec: 200
     };
 
     // prevent book.js from breaking left/right arrows
@@ -380,7 +387,7 @@ that multiplies a value by five:</p>
       },
       false);
 </script>
-<p>We can check if two values are equal using the <code>=</code> operator.
+<p>We can check if two values are equal using <code>=</code>.
 These practice problems gradually get more difficult.</p>
 <pre><code class="language-klipse">(= 4
    (+ 2 2))
@@ -400,8 +407,8 @@ so the editor prints <code>true</code>.</p>
 </code></pre>
 <hr />
 <pre><code class="language-klipse">(= _
-   (+ (* 3 4)
-      (/ 40 5)))
+   (* 10
+      (+ 3 4)))
 </code></pre>
 <hr />
 <pre><code class="language-klipse">(defn times-five
@@ -421,7 +428,7 @@ so the editor prints <code>true</code>.</p>
 (= 9
    (square 3))
 </code></pre>
-<p>New concept: here we <strong>def</strong>ine a value outside our function definition.
+<p>Here's a new concept: we can <strong>def</strong>ine a value outside our function definition.
 We can still use that within our function, though.</p>
 <pre><code class="language-klipse">(def pi 3.14)
 
@@ -442,7 +449,8 @@ We can still use that within our function, though.</p>
   href="https://storage.googleapis.com/app.klipse.tech/css/codemirror.css">
 <script>
     window.klipse_settings = {
-        selector: '.language-klipse'
+        selector: '.language-klipse',
+        eval_idle_msec: 200
     };
 
     // prevent book.js from breaking left/right arrows
@@ -463,6 +471,20 @@ We can still use that within our function, though.</p>
       },
       false);
 </script>
+<p>We've discussed building series of operations together to form complex ones.
+We can do the same thing for data.</p>
+<p>Think about this particular piece of data: a single word.</p>
+<p>What can be built starting with a single word? Well,</p>
+<ul>
+<li>Words form sentences</li>
+<li>Sentences form paragraphs</li>
+<li>Paragraphs form chapters</li>
+<li>Chapters form books</li>
+<li>Books form libraries</li>
+</ul>
+<p>Starting from something very small, you can build pieces together to form something huge.
+In much the same way, all complex pieces of data are
+fundamentally built from much smaller pieces gradually combined together.</p>
 <p>Let's say we want to start writing a grocery list.
 How do we do that?: one item at a time.</p>
 <p>We'll say for the moment that an item on our grocery list
@@ -487,7 +509,7 @@ other operations.</p>
 <p>They need to be individual pieces within some larger whole -
 a slightly more complex piece of data.
 In Clojure, one way of doing this is to write the individual pieces
-within square brackets, optionally with commas in between, like so:</p>
+within square brackets, like so:</p>
 <pre><code class="language-clojure">[&quot;apples&quot;, &quot;bananas&quot;, &quot;milk&quot;, &quot;eggs&quot;, &quot;bread&quot;]
 </code></pre>
 <p>Much better! This particular piece of data is one we can easily
@@ -505,6 +527,15 @@ all handy functions for working with series of data.
 Here's one more: if we want to add a new item to our grocery list,
 we <strong>conj</strong>oin an item to it with the <code>conj</code> function:</p>
 <pre><code class="language-klipse">(conj [&quot;apples&quot;, &quot;bananas&quot;, &quot;milk&quot;, &quot;eggs&quot;, &quot;bread&quot;] &quot;juice&quot;)
+</code></pre>
+<p>Try writing your own grocery lists:</p>
+<pre><code class="language-klipse">(first [])
+</code></pre>
+<hr />
+<pre><code class="language-klipse">(last [])
+</code></pre>
+<hr />
+<pre><code class="language-klipse">(conj [] &quot;bananas&quot;)
 </code></pre>
 <p>Let's go one step further.
 In most American grocery stores, apples and bananas with be in the produce section,
@@ -540,7 +571,8 @@ into a very useful structure.</p>
   href="https://storage.googleapis.com/app.klipse.tech/css/codemirror.css">
 <script>
     window.klipse_settings = {
-        selector: '.language-klipse'
+        selector: '.language-klipse',
+        eval_idle_msec: 200
     };
 
     // prevent book.js from breaking left/right arrows
@@ -565,17 +597,29 @@ into a very useful structure.</p>
 our own functions, we can define <em>variables</em> as well.</p>
 <p>Variables are pieces of data that we give a name to so we can easily
 reference them from any number of places.</p>
-<p>We <strong>def</strong>ine a variable with the <code>def</code> operator:</p>
+<p>We <strong>def</strong>ine a variable with <code>def</code>:</p>
 <pre><code class="language-klipse">(def four 4)
 
 four
 </code></pre>
-<p>In addition to using variables in functions,
-we can also use them in the definitions of other variables.
-Take the last grocery list structure we made, for example.
+<p>In addition to using variables in our function definitions,
+we can also use them when we're creating other variables.
+Going back to the final exercise of chapter two,
+here's an example:</p>
+<pre><code class="language-klipse">(def pi 3.14)
+
+(def radius 2)
+
+(def circumference (* 2 pi radius))
+
+circumference
+</code></pre>
+<p>Take the last grocery list structure we made, for example.
 We could define each of our categories of items as their
 own variables, then include them within
 the overall grocery list variable.</p>
+<p>Try adding to the items we want to buy,
+or maybe even add a section, if you're up to it!</p>
 <pre><code class="language-klipse">(def produce-items [&quot;apples&quot; &quot;bananas&quot;])
 (def dairy-items [&quot;milk&quot; &quot;eggs&quot;])
 (def bakery-items [&quot;bread&quot;])
@@ -587,17 +631,34 @@ the overall grocery list variable.</p>
 
 grocery-list
 </code></pre>
-<p>Going back to the final exercise of chapter two,
-here's another example:</p>
-<pre><code class="language-klipse">(def pi 3.14)
+<p>Alternatively, given a complex piece of data,
+we can grab smaller pieces of data out of it.
+Let's say we're in the dairy section of the
+store, so we want to find the list of items that
+we want to grab in this section.
+We can do this this by using the <code>get</code> function
+on our grocery list with the name of the current section:</p>
+<pre><code class="language-klipse">(def grocery-list
+  {&quot;produce&quot; [&quot;apples&quot;, &quot;bananas&quot;],
+   &quot;dairy&quot;   [&quot;milk&quot;, &quot;eggs&quot;],
+   &quot;bakery&quot;  [&quot;bread&quot;]})
 
-(def radius 2)
+(def current-section &quot;dairy&quot;)
 
-(def circumference (* 2 pi radius))
+(def items-to-get
+  (get grocery-list current-section))
 
-circumference
+items-to-get
 </code></pre>
-<p>Again, feel free to modify the code above and play around!</p>
+<p>Breaking that down: we have a piece of data which are names of grocery store
+sections associated with items that we want to buy in that section.
+We have given this data the name <code>grocery-list</code> by defining it as a variable.</p>
+<p>We define another variable called <code>current-section</code> with the section
+of the store we're currently in, <code>&quot;dairy&quot;</code>.</p>
+<p>Then we <code>get</code>, from our grocery list, the items associated
+with the current section we're in.</p>
+<p>Try changing the value of <code>current-section</code> to <code>&quot;produce&quot;</code> or <code>&quot;bakery</code>&quot;.
+And again, if you're up to it, try adding a new section of your own!</p>
 <script
   src="https://storage.googleapis.com/app.klipse.tech/plugin/js/klipse_plugin.js">
 </script>

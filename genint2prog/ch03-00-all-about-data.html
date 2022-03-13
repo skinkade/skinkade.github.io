@@ -149,7 +149,8 @@
   href="https://storage.googleapis.com/app.klipse.tech/css/codemirror.css">
 <script>
     window.klipse_settings = {
-        selector: '.language-klipse'
+        selector: '.language-klipse',
+        eval_idle_msec: 200
     };
 
     // prevent book.js from breaking left/right arrows
@@ -170,6 +171,20 @@
       },
       false);
 </script>
+<p>We've discussed building series of operations together to form complex ones.
+We can do the same thing for data.</p>
+<p>Think about this particular piece of data: a single word.</p>
+<p>What can be built starting with a single word? Well,</p>
+<ul>
+<li>Words form sentences</li>
+<li>Sentences form paragraphs</li>
+<li>Paragraphs form chapters</li>
+<li>Chapters form books</li>
+<li>Books form libraries</li>
+</ul>
+<p>Starting from something very small, you can build pieces together to form something huge.
+In much the same way, all complex pieces of data are
+fundamentally built from much smaller pieces gradually combined together.</p>
 <p>Let's say we want to start writing a grocery list.
 How do we do that?: one item at a time.</p>
 <p>We'll say for the moment that an item on our grocery list
@@ -194,7 +209,7 @@ other operations.</p>
 <p>They need to be individual pieces within some larger whole -
 a slightly more complex piece of data.
 In Clojure, one way of doing this is to write the individual pieces
-within square brackets, optionally with commas in between, like so:</p>
+within square brackets, like so:</p>
 <pre><code class="language-clojure">[&quot;apples&quot;, &quot;bananas&quot;, &quot;milk&quot;, &quot;eggs&quot;, &quot;bread&quot;]
 </code></pre>
 <p>Much better! This particular piece of data is one we can easily
@@ -212,6 +227,15 @@ all handy functions for working with series of data.
 Here's one more: if we want to add a new item to our grocery list,
 we <strong>conj</strong>oin an item to it with the <code>conj</code> function:</p>
 <pre><code class="language-klipse">(conj [&quot;apples&quot;, &quot;bananas&quot;, &quot;milk&quot;, &quot;eggs&quot;, &quot;bread&quot;] &quot;juice&quot;)
+</code></pre>
+<p>Try writing your own grocery lists:</p>
+<pre><code class="language-klipse">(first [])
+</code></pre>
+<hr />
+<pre><code class="language-klipse">(last [])
+</code></pre>
+<hr />
+<pre><code class="language-klipse">(conj [] &quot;bananas&quot;)
 </code></pre>
 <p>Let's go one step further.
 In most American grocery stores, apples and bananas with be in the produce section,

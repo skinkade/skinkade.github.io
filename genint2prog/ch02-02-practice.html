@@ -149,7 +149,8 @@
   href="https://storage.googleapis.com/app.klipse.tech/css/codemirror.css">
 <script>
     window.klipse_settings = {
-        selector: '.language-klipse'
+        selector: '.language-klipse',
+        eval_idle_msec: 200
     };
 
     // prevent book.js from breaking left/right arrows
@@ -170,7 +171,7 @@
       },
       false);
 </script>
-<p>We can check if two values are equal using the <code>=</code> operator.
+<p>We can check if two values are equal using <code>=</code>.
 These practice problems gradually get more difficult.</p>
 <pre><code class="language-klipse">(= 4
    (+ 2 2))
@@ -190,8 +191,8 @@ so the editor prints <code>true</code>.</p>
 </code></pre>
 <hr />
 <pre><code class="language-klipse">(= _
-   (+ (* 3 4)
-      (/ 40 5)))
+   (* 10
+      (+ 3 4)))
 </code></pre>
 <hr />
 <pre><code class="language-klipse">(defn times-five
@@ -211,7 +212,7 @@ so the editor prints <code>true</code>.</p>
 (= 9
    (square 3))
 </code></pre>
-<p>New concept: here we <strong>def</strong>ine a value outside our function definition.
+<p>Here's a new concept: we can <strong>def</strong>ine a value outside our function definition.
 We can still use that within our function, though.</p>
 <pre><code class="language-klipse">(def pi 3.14)
 

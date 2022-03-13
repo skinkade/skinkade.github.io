@@ -149,7 +149,8 @@
   href="https://storage.googleapis.com/app.klipse.tech/css/codemirror.css">
 <script>
     window.klipse_settings = {
-        selector: '.language-klipse'
+        selector: '.language-klipse',
+        eval_idle_msec: 200
     };
 
     // prevent book.js from breaking left/right arrows
@@ -174,17 +175,29 @@
 our own functions, we can define <em>variables</em> as well.</p>
 <p>Variables are pieces of data that we give a name to so we can easily
 reference them from any number of places.</p>
-<p>We <strong>def</strong>ine a variable with the <code>def</code> operator:</p>
+<p>We <strong>def</strong>ine a variable with <code>def</code>:</p>
 <pre><code class="language-klipse">(def four 4)
 
 four
 </code></pre>
-<p>In addition to using variables in functions,
-we can also use them in the definitions of other variables.
-Take the last grocery list structure we made, for example.
+<p>In addition to using variables in our function definitions,
+we can also use them when we're creating other variables.
+Going back to the final exercise of chapter two,
+here's an example:</p>
+<pre><code class="language-klipse">(def pi 3.14)
+
+(def radius 2)
+
+(def circumference (* 2 pi radius))
+
+circumference
+</code></pre>
+<p>Take the last grocery list structure we made, for example.
 We could define each of our categories of items as their
 own variables, then include them within
 the overall grocery list variable.</p>
+<p>Try adding to the items we want to buy,
+or maybe even add a section, if you're up to it!</p>
 <pre><code class="language-klipse">(def produce-items [&quot;apples&quot; &quot;bananas&quot;])
 (def dairy-items [&quot;milk&quot; &quot;eggs&quot;])
 (def bakery-items [&quot;bread&quot;])
@@ -196,17 +209,34 @@ the overall grocery list variable.</p>
 
 grocery-list
 </code></pre>
-<p>Going back to the final exercise of chapter two,
-here's another example:</p>
-<pre><code class="language-klipse">(def pi 3.14)
+<p>Alternatively, given a complex piece of data,
+we can grab smaller pieces of data out of it.
+Let's say we're in the dairy section of the
+store, so we want to find the list of items that
+we want to grab in this section.
+We can do this this by using the <code>get</code> function
+on our grocery list with the name of the current section:</p>
+<pre><code class="language-klipse">(def grocery-list
+  {&quot;produce&quot; [&quot;apples&quot;, &quot;bananas&quot;],
+   &quot;dairy&quot;   [&quot;milk&quot;, &quot;eggs&quot;],
+   &quot;bakery&quot;  [&quot;bread&quot;]})
 
-(def radius 2)
+(def current-section &quot;dairy&quot;)
 
-(def circumference (* 2 pi radius))
+(def items-to-get
+  (get grocery-list current-section))
 
-circumference
+items-to-get
 </code></pre>
-<p>Again, feel free to modify the code above and play around!</p>
+<p>Breaking that down: we have a piece of data which are names of grocery store
+sections associated with items that we want to buy in that section.
+We have given this data the name <code>grocery-list</code> by defining it as a variable.</p>
+<p>We define another variable called <code>current-section</code> with the section
+of the store we're currently in, <code>&quot;dairy&quot;</code>.</p>
+<p>Then we <code>get</code>, from our grocery list, the items associated
+with the current section we're in.</p>
+<p>Try changing the value of <code>current-section</code> to <code>&quot;produce&quot;</code> or <code>&quot;bakery</code>&quot;.
+And again, if you're up to it, try adding a new section of your own!</p>
 <script
   src="https://storage.googleapis.com/app.klipse.tech/plugin/js/klipse_plugin.js">
 </script>

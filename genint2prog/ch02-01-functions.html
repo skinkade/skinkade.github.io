@@ -149,7 +149,8 @@
   href="https://storage.googleapis.com/app.klipse.tech/css/codemirror.css">
 <script>
     window.klipse_settings = {
-        selector: '.language-klipse'
+        selector: '.language-klipse',
+        eval_idle_msec: 200
     };
 
     // prevent book.js from breaking left/right arrows
@@ -170,19 +171,17 @@
       },
       false);
 </script>
-<p>We've seen operators for addition, subtraction, multiplication, and division.
-We're far from limited to those, though.
-Clojure has hundreds of operators built-in.
-Let's talk about how a lot of those operators are defined.</p>
-<p>For the moment, we're going to say that a <strong>function</strong> is an operation
-which takes some input data and returns some output data.</p>
-<p>To <strong>de</strong>fine a <strong>f</strong>u<strong>n</strong>ction, we use the <code>defn</code> operator.
+<p>We've seen functions for addition, subtraction, multiplication, and division.
+We're far from limited to those, though!
+Not only does Clojure have hundreds of functions built-in,
+we can define our own functions to use!</p>
+<p>To <strong>de</strong>fine a <strong>f</strong>u<strong>n</strong>ction, we use <code>defn</code>.
 The form for this looks like:</p>
 <pre><code class="language-clojure">(defn function-name
     [input]
     (do-something-with input))
 </code></pre>
-<p>Remember that this is a list, where the first item is the operator <code>defn</code>.
+<p>Remember that this is a list, where the first item is <code>defn</code>.
 In this case:</p>
 <ul>
 <li>the second item is the name we want to give to the function we're defining</li>
