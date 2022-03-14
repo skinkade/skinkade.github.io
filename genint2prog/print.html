@@ -82,7 +82,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="title-page.html">A Gentle Introduction to Interactive Programming</a></li><li class="chapter-item expanded "><a href="ch01-00-introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="ch02-00-let-the-code-begin.html"><strong aria-hidden="true">2.</strong> Let the Code Begin</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch02-01-functions.html"><strong aria-hidden="true">2.1.</strong> Functions</a></li><li class="chapter-item expanded "><a href="ch02-02-practice.html"><strong aria-hidden="true">2.2.</strong> Practice</a></li></ol></li><li class="chapter-item expanded "><a href="ch03-00-all-about-data.html"><strong aria-hidden="true">3.</strong> All About Data</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch03-01-variables.html"><strong aria-hidden="true">3.1.</strong> Variables</a></li></ol></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="title-page.html">A Gentle Introduction to Interactive Programming</a></li><li class="chapter-item expanded "><a href="ch01-00-introduction.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="ch02-00-let-the-code-begin.html"><strong aria-hidden="true">2.</strong> Let the Code Begin</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch02-01-functions.html"><strong aria-hidden="true">2.1.</strong> Functions</a></li><li class="chapter-item expanded "><a href="ch02-02-practice.html"><strong aria-hidden="true">2.2.</strong> Practice</a></li></ol></li><li class="chapter-item expanded "><a href="ch03-00-all-about-data.html"><strong aria-hidden="true">3.</strong> All About Data</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ch03-01-variables.html"><strong aria-hidden="true">3.1.</strong> Variables</a></li></ol></li><li class="chapter-item expanded "><a href="ch04-00-conditions.html"><strong aria-hidden="true">4.</strong> Conditions</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -183,12 +183,13 @@ Both the input and the output are <em>data</em>.</p>
 </ul>
 <p>We're getting ahead of ourselves, though.
 When you really get down to it, some of the above gets pretty technical.</p>
-<p>Let's start with some very basic math.
+<p>Let's start with some arithmetic.
 Note: you do <strong>not</strong> need to know advanced math to be a programmer!</p>
-<p>Imagine a simple math problem like <code>2 + 2</code> or <code>3 * 4</code>.
+<p>Imagine a math problem like <code>2 + 2</code> or <code>3 * 4</code>.
 Very simple on its own, but if you think about it, you can keep combining
 more and more simple problems to form a more difficult one. Say...</p>
-<p><code>2 + 8 * 3 / 6 * (10 - 7)</code></p>
+<pre><code>2 + 8 * 3 / 6 * (10 - 7)
+</code></pre>
 <p>Suddenly you've got a more complex problem,
 but so long as you follow some rules (PEMDAS / BODMAS),
 you can break it back down into smaller parts to make it easier to solve:</p>
@@ -201,6 +202,9 @@ you can break it back down into smaller parts to make it easier to solve:</p>
 </code></pre>
 <p>Computing works in the same way: every complex procedure is just a series of
 smaller procedures, that can even be broken down and re-combined in different ways.</p>
+<p>This book uses the Clojure programming, which is known to be
+particularly good for breaking complex problems into smaller,
+easier ones.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="2-let-the-code-begin"><a class="header" href="#2-let-the-code-begin">2. Let the Code Begin</a></h1>
 <link
   rel="stylesheet"
@@ -659,6 +663,98 @@ of the store we're currently in, <code>&quot;dairy&quot;</code>.</p>
 with the current section we're in.</p>
 <p>Try changing the value of <code>current-section</code> to <code>&quot;produce&quot;</code> or <code>&quot;bakery</code>&quot;.
 And again, if you're up to it, try adding a new section of your own!</p>
+<script
+  src="https://storage.googleapis.com/app.klipse.tech/plugin/js/klipse_plugin.js">
+</script>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="4-conditions"><a class="header" href="#4-conditions">4. Conditions</a></h1>
+<link
+  rel="stylesheet"
+  type="text/css"
+  href="https://storage.googleapis.com/app.klipse.tech/css/codemirror.css">
+<script>
+    window.klipse_settings = {
+        selector: '.language-klipse',
+        eval_idle_msec: 200
+    };
+
+    // prevent book.js from breaking left/right arrows
+    document.addEventListener(
+      'keydown',
+      function (e) {
+        if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) { return; }
+        if (window.search && window.search.hasFocus()) { return; }
+
+        switch (e.key) {
+          case 'ArrowRight':
+            e.stopImmediatePropagation();
+            break;
+          case 'ArrowLeft':
+            e.stopImmediatePropagation();
+            break;
+        }
+      },
+      false);
+</script>
+<p>I want dessert.
+If there's apple pie in the house, I'll eat some apple pie,
+and if not, I'll have some ice cream.</p>
+<p>Let's express that in code!</p>
+<pre><code class="language-clojure">(if have-apple-pie?
+  (eat apple-pie)
+  (eat ice-cream))
+</code></pre>
+<p>This is called <em>conditional logic</em>:</p>
+<ul>
+<li>if [condition]</li>
+<li>then [do something]</li>
+<li>else [do a different thing]</li>
+</ul>
+<p>In Clojure, this is expressed with the following form:</p>
+<pre><code class="language-clojure">(if condition?
+  ;; then
+  (do-thing)
+  ;; else
+  (do-other-thing))
+</code></pre>
+<p>A bunch of things to cover here!</p>
+<p>Additional new concept: those lines starting with <code>;;</code> are <em>comments</em>.
+Comments are lines within code that are not evaluated.
+They're a way of explaining code right next to the code itself.
+Here I added two comments to make it clearer that the first
+expression after the <code>condition?</code> is what happens if <code>condition?</code>
+is <em>true</em>, else the second expression happens.</p>
+<p>Side note: conditions like this in Clojure typically have a question
+mark at the end to make it clear they're either true or false.</p>
+<p>Let's introduce one more function that'll make things easier
+for this section. The <code>println</code> function <strong>print</strong>s a value
+to its own <strong>l</strong>i<strong>n</strong>e of text.</p>
+<p>Let's combine a number of concepts we've learned so far:
+we'll have two number variables, then check if those numbers
+are equal. If they are, we'll print a success message,
+and if not, a failure message.</p>
+<pre><code class="language-klipse">(def x 2)
+(def y 3)
+
+(if (= x y)
+  (println &quot;The values are equal :)&quot;)
+  (println &quot;The values are not equal :(&quot;))
+</code></pre>
+<p>Another common example is changing behavior based on whether
+a number is above or below some threshold.</p>
+<pre><code class="language-klipse">(def apples-eaten 2)
+
+(defn eat-another-apple
+  []
+  (println &quot;Keeping the doctor away for another day!&quot;))
+
+(if (&gt; apples-eaten 3)
+  (println &quot;You've eaten an unreasonable number of apples&quot;)
+  (eat-another-apple))
+</code></pre>
+<p>Here we check if the number of apples eaten so far is more than three,
+in which case we give the user an indication that maybe they should
+cool it with apples for the day.
+Otherwise, go ahead and eat another (if they want).</p>
 <script
   src="https://storage.googleapis.com/app.klipse.tech/plugin/js/klipse_plugin.js">
 </script>
